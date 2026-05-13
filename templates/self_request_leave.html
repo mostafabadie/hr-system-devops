@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}طلب إجازة - بوابة الموظف{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">طلب إجازة</h2>
+<p class="text-muted mb-4">اختر نوع الإجازة وحدد الفترة، ويمكنك مشاهدة رصيدك لكل نوع.</p>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <form method="post" class="card p-3">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="mb-3">
+                <label class="form-label">نوع الإجازة</label>
+                <select name="leave_type_id" class="form-select" required>
+                    <option value="">اختر النوع</option>
+                    {% for lt in leave_types %}
+                    <option value="{{ lt.id }}">{{ lt.name }} ({{ lt.max_days }} يوم سنوياً)</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">تاريخ البداية</label>
+                <input type="date" name="start_date" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">تاريخ النهاية</label>
+                <input type="date" name="end_date" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">السبب</label>
+                <textarea name="reason" class="form-control" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">إرسال الطلب</button>
+        </form>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card p-3">
+            <h5 class="mb-3">رصيد الإجازات</h5>
+            {% if balances %}
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>نوع الإجازة</th>
+                            <th>المخصص</th>
+                            <th>المستخدم</th>
+                            <th>المتبقي</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for b in balances %}
+                        <tr>
+                            <td>{{ b.leave_type_name }}</td>
+                            <td>{{ b.allocated_days }}</td>
+                            <td>{{ b.used_days }}</td>
+                            <td>{{ b.remaining_days }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted mb-0">لا توجد بيانات رصيد متاحة حالياً.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<a href="{{ url_for('portal.self_portal') }}" class="btn btn-link">العودة إلى بوابة الموظف</a>
+{% endblock %}
+

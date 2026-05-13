@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}قسائم الرواتب - بوابة الموظف{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">قسائم الرواتب</h2>
+
+{% if payrolls %}
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>تاريخ الدفع</th>
+                <th>الراتب الأساسي</th>
+                <th>الحوافز</th>
+                <th>الخصومات</th>
+                <th>صافي الراتب</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in payrolls %}
+            <tr>
+                <td>{{ p.payment_date }}</td>
+                <td>{{ p.salary }}</td>
+                <td>{{ p.bonus }}</td>
+                <td>{{ p.deductions }}</td>
+                <td><strong>{{ p.net_salary }}</strong></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p class="text-muted">لا توجد رواتب مسجّلة لك حالياً.</p>
+{% endif %}
+
+<a href="{{ url_for('portal.self_portal') }}" class="btn btn-link mt-3">العودة إلى بوابة الموظف</a>
+{% endblock %}
+

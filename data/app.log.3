@@ -1,0 +1,104 @@
+2026-05-10 00:54:35,600 ERROR: Exception on /leaves/request [POST] [in C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py:875]
+Traceback (most recent call last):
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Download\HR-System-2-project-main\HR-System-2-project-main\routes\leaves.py", line 57, in request_leave
+    return redirect(url_for('request_leave'))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\helpers.py", line 232, in url_for
+    return current_app.url_for(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'request_leave'. Did you mean 'leaves.request_leave' instead?
+2026-05-10 00:54:35,610 ERROR: Server error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application. [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:65]
+2026-05-10 00:54:54,673 INFO: HR System startup [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:38]
+2026-05-10 00:55:16,181 ERROR: Exception on /leaves/approve/6 [POST] [in C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py:875]
+Traceback (most recent call last):
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Download\HR-System-2-project-main\HR-System-2-project-main\routes\leaves.py", line 92, in approve_leave
+    return redirect(url_for('pending_leaves'))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\helpers.py", line 232, in url_for
+    return current_app.url_for(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'pending_leaves'. Did you mean 'leaves.pending_leaves' instead?
+2026-05-10 00:55:16,185 ERROR: Server error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application. [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:65]
+2026-05-10 00:56:12,032 INFO: HR System startup [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:38]
+2026-05-10 00:57:26,334 INFO: HR System startup [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:38]
+2026-05-10 00:57:26,334 INFO: HR System startup [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:38]
+2026-05-10 00:57:26,452 ERROR: Evaluation error: UNIQUE constraint failed: performance_evaluations.employee_id, performance_evaluations.period_id [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\routes\performance.py:300]
+2026-05-10 00:57:26,452 ERROR: Evaluation error: UNIQUE constraint failed: performance_evaluations.employee_id, performance_evaluations.period_id [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\routes\performance.py:300]
+2026-05-10 01:00:57,951 INFO: HR System startup [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:38]
+2026-05-10 01:01:13,531 INFO: HR System startup [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:38]
+2026-05-10 01:01:34,071 INFO: HR System startup [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:38]
+2026-05-10 01:01:51,400 INFO: HR System startup [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:38]
+2026-05-10 01:02:24,176 INFO: HR System startup [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:38]
+2026-05-10 01:02:41,867 INFO: HR System startup [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:38]
+2026-05-10 01:03:04,665 INFO: HR System startup [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:38]
+2026-05-10 01:03:20,769 ERROR: Exception on /performance/evaluate/143886 [GET] [in C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py:875]
+Traceback (most recent call last):
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Download\HR-System-2-project-main\HR-System-2-project-main\routes\performance.py", line 220, in evaluate_employee
+    return redirect(url_for('performance.evaluate', period_id=period_id))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\helpers.py", line 232, in url_for
+    return current_app.url_for(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'performance.evaluate' with values ['period_id']. Did you mean 'performance.evaluate_employee' instead?
+2026-05-10 01:03:20,774 ERROR: Server error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application. [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:65]
+2026-05-10 01:03:44,089 INFO: HR System startup [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:38]

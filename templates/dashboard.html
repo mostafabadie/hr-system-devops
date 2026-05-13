@@ -1,0 +1,728 @@
+{% extends "base.html" %}
+
+{% block page_title %}لوحة التحكم{% endblock %}
+
+{% block content %}
+    <!-- KPI Cards Row -->
+    <div class="row g-3 mb-4">
+        <!-- Total Employees -->
+        <div class="col-xl-3 col-md-6 col-sm-6 col-12">
+            <div class="kpi-card primary">
+                <div class="kpi-icon-wrapper">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <div class="kpi-value">{{ total_employees or 0 }}</div>
+                <div class="kpi-label">إجمالي الموظفين</div>
+                <div class="kpi-trend">
+                    <i class="bi bi-person-check"></i> موظف مسجل
+                </div>
+            </div>
+        </div>
+
+        <!-- Present Today -->
+        <div class="col-xl-3 col-md-6 col-sm-6 col-12">
+            <div class="kpi-card success">
+                <div class="kpi-icon-wrapper">
+                    <i class="bi bi-person-check-fill"></i>
+                </div>
+                <div class="kpi-value">{{ present_today or 0 }}</div>
+                <div class="kpi-label">الحضور اليوم</div>
+                <div class="kpi-trend">
+                    <i class="bi bi-graph-up"></i>
+                    {% if total_employees > 0 %}
+                        {{ ((present_today / total_employees) * 100)|round }}% نسبة الحضور
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Absent Today -->
+        <div class="col-xl-3 col-md-6">
+            <div class="kpi-card danger">
+                <div class="kpi-icon-wrapper">
+                    <i class="bi bi-person-x-fill"></i>
+                </div>
+                <div class="kpi-value">{{ absent_today or 0 }}</div>
+                <div class="kpi-label">الغياب اليوم</div>
+                <div class="kpi-trend">
+                    <i class="bi bi-graph-down"></i>
+                    {% if total_employees > 0 %}
+                        {{ ((absent_today / total_employees) * 100)|round }}% نسبة الغياب
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- On Leave Today -->
+        <div class="col-xl-3 col-md-6">
+            <div class="kpi-card warning">
+                <div class="kpi-icon-wrapper">
+                    <i class="bi bi-umbrella-fill"></i>
+                </div>
+                <div class="kpi-value">{{ on_leave_today or 0 }}</div>
+                <div class="kpi-label">في إجازة </div>
+                <div class="kpi-trend">
+                    <i class="bi bi-calendar-check"></i> طلبات إجازة معتمدة
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Second KPI Row -->
+    <div class="row g-3 mb-4">
+        <!-- Pending Leaves -->
+        <div class="col-xl-3 col-md-6">
+            <div class="kpi-card info">
+                <div class="kpi-icon-wrapper">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+                <div class="kpi-value">{{ pending_leaves or 0 }}</div>
+                <div class="kpi-label">طلبات الإجازة المعلقة</div>
+                <div class="kpi-trend">
+                    <i class="bi bi-clock"></i> بانتظار الموافقة
+                </div>
+            </div>
+        </div>
+
+        <!-- Average Performance -->
+        <div class="col-xl-3 col-md-6">
+            <div class="kpi-card purple">
+                <div class="kpi-icon-wrapper">
+                    <i class="bi bi-star-fill"></i>
+                </div>
+                <div class="kpi-value">{{ "%.1f"|format(avg_performance) if avg_performance else "0.0" }}</div>
+                <div class="kpi-label">متوسط تقييم الأداء</div>
+                <div class="kpi-trend">
+                    <i class="bi bi-bar-chart"></i> من 5.0
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Payroll -->
+        <div class="col-xl-3 col-md-6">
+            <div class="kpi-card info">
+                <div class="kpi-icon-wrapper">
+                    <i class="bi bi-cash-stack"></i>
+                </div>
+                <div class="kpi-value" style="font-size: 1.4rem;">
+                    {{ "{:,.0f}".format(monthly_payroll) if monthly_payroll else "0" }} ر.س
+                </div>
+                <div class="kpi-label">رواتب الشهر الحالي</div>
+                <div class="kpi-trend">
+                    <i class="bi bi-calendar-month"></i> {{ current_month }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Departments -->
+        <div class="col-xl-3 col-md-6">
+            <div class="kpi-card purple">
+                <div class="kpi-icon-wrapper">
+                    <i class="bi bi-diagram-3"></i>
+                </div>
+                <div class="kpi-value">{{ total_departments or 0 }}</div>
+                <div class="kpi-label">الأقسام النشطة</div>
+                <div class="kpi-trend">
+                    <i class="bi bi-building"></i> قسم
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 1: Department Distribution & Attendance Trend -->
+    <div class="section-title">
+        <i class="bi bi-pie-chart-fill text-primary"></i> تحليل الحضور والموظفين
+    </div>
+    <div class="row g-4 mb-4">
+        <!-- Department Distribution -->
+        <div class="col-lg-6">
+            <div class="card-modern">
+                <div class="card-header">
+                    <i class="bi bi-pie-chart text-primary me-2"></i> توزيع الموظفين على الأقسام
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="departmentChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance Trend -->
+        <div class="col-lg-6">
+            <div class="card-modern">
+                <div class="card-header">
+                    <i class="bi bi-graph-up text-success me-2"></i> اتجاه الحضور (آخر 30 يوم)
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="attendanceTrendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 2: Leave Usage & Monthly Payroll -->
+    <div class="section-title">
+        <i class="bi bi-bar-chart-fill text-warning"></i> تحليل الإجازات والرواتب
+    </div>
+    <div class="row g-4 mb-4">
+        <!-- Leave Usage -->
+        <div class="col-lg-6">
+            <div class="card-modern">
+                <div class="card-header">
+                    <i class="bi bi-umbrella text-warning me-2"></i> استخدام الإجازات حسب النوع ({{ current_year }})
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="leaveUsageChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Payroll -->
+        <div class="col-lg-6">
+            <div class="card-modern">
+                <div class="card-header">
+                    <i class="bi bi-cash-stack text-info me-2"></i> إجمالي الرواتب الشهرية ({{ current_year }})
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="payrollChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 3: Performance & Department Salary -->
+    <div class="section-title">
+        <i class="bi bi-star-fill text-warning"></i> تحليل الأداء والرواتب
+    </div>
+    <div class="row g-4 mb-4">
+        <!-- Performance Distribution -->
+        <div class="col-lg-6">
+            <div class="card-modern">
+                <div class="card-header">
+                    <i class="bi bi-star text-warning me-2"></i> توزيع تقييمات الأداء
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Department Salary Average -->
+        <div class="col-lg-6">
+            <div class="card-modern">
+                <div class="card-header">
+                    <i class="bi bi-currency-exchange text-success me-2"></i> متوسط الرواتب حسب القسم
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="deptSalaryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Department Attendance Summary -->
+    <div class="section-title">
+        <i class="bi bi-clipboard-check-fill text-primary"></i> ملخص حضور الأقسام ({{ current_month }})
+    </div>
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="card-modern">
+                <div class="card-header">
+                    <i class="bi bi-building text-primary me-2"></i> نسبة الحضور لكل قسم
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table-modern">
+                            <thead>
+                                <tr>
+                                    <th>القسم</th>
+                                    <th>عدد الموظفين الحاضرين</th>
+                                    <th>إجمالي الموظفين في القسم</th>
+                                    <th>نسبة الحضور</th>
+                                    <th>التقدم</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dept in dept_attendance or [] %}
+                                <tr>
+                                    <td>
+                                        <i class="bi bi-folder2-open text-primary me-2"></i>
+                                        {{ dept.department }}
+                                    </td>
+                                    <td>{{ dept.present_count or 0 }}</td>
+                                    <td>{{ dept.total_employees or 0 }}</td>
+                                    <td>
+                                        {% if dept.total_records > 0 %}
+                                            {{ ((dept.present_count / dept.total_employees) * 100)|round }}%
+                                        {% else %}
+                                            0%
+                                        {% endif %}
+                                    </td>
+                                    <td style="min-width: 250px;">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="progress flex-grow-1" style="height: 8px;">
+                                                <div class="progress-bar bg-success"
+                                                     style="width: {{ ((dept.present_count / dept.total_employees) * 100)|round if dept.total_employees > 0 else 0 }}%">
+                                                </div>
+                                            </div>
+                                    
+                                            <small class="text-muted">
+                                                {{ ((dept.present_count / dept.total_employees) * 100)|round(1) if dept.total_employees > 0 else 0 }}%
+                                            </small>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">
+                                        <i class="bi bi-info-circle me-2"></i> لا توجد بيانات حضور متاحة
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tables Row: Top Absentees & Recent Leaves -->
+    <div class="section-title">
+        <i class="bi bi-list-ul text-primary"></i> التقارير والبيانات التفصيلية
+    </div>
+    <div class="row g-4 mb-4">
+        <!-- Top Absentees -->
+        <div class="col-lg-4">
+            <div class="card-modern">
+                <div class="card-header">
+                    <i class="bi bi-person-x-fill text-danger me-2"></i> أكثر الموظفين غياباً (آخر 30 يوم)
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table-modern">
+                            <thead>
+                                <tr>
+                                    <th>الموظف</th>
+                                    <th>القسم</th>
+                                    <th>أيام الغياب</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for emp in top_absentees or [] %}
+                                <tr>
+                                    <td>{{ emp.name }}</td>
+                                    <td>{{ emp.department }}</td>
+                                    <td>
+                                        <span class="badge bg-danger badge-modern">{{ emp.absent_days }}</span>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted py-3">
+                                        لا توجد بيانات
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Leave Requests -->
+        <div class="col-lg-4">
+            <div class="card-modern">
+                <div class="card-header">
+                    <i class="bi bi-calendar-x-fill text-warning me-2"></i> أحدث طلبات الإجازة
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table-modern">
+                            <thead>
+                                <tr>
+                                    <th>الموظف</th>
+                                    <th>النوع</th>
+                                    <th>الحالة</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for leave in recent_leaves or [] %}
+                                <tr>
+                                    <td>{{ leave.employee_name }}</td>
+                                    <td>{{ leave.leave_type }}</td>
+                                    <td>
+                                        {% if leave.status == 'approved' %}
+                                            <span class="badge bg-success badge-modern">معتمدة</span>
+                                        {% elif leave.status == 'pending' %}
+                                            <span class="badge bg-warning badge-modern">معلقة</span>
+                                        {% elif leave.status == 'rejected' %}
+                                            <span class="badge bg-danger badge-modern">مرفوضة</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary badge-modern">{{ leave.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted py-3">
+                                        لا توجد طلبات إجازة
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Earners -->
+        <div class="col-lg-4">
+            <div class="card-modern">
+                <div class="card-header">
+                    <i class="bi bi-trophy-fill text-warning me-2"></i> أعلى الموظفين راتباً
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table-modern">
+                            <thead>
+                                <tr>
+                                    <th>الموظف</th>
+                                    <th>القسم</th>
+                                    <th>الراتب</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for emp in top_earners or [] %}
+                                <tr>
+                                    <td>{{ emp.name }}</td>
+                                    <td>{{ emp.department }}</td>
+                                    <td>
+                                        <strong>{{ "{:,.0f}".format(emp.salary) }}</strong> ر.س
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted py-3">
+                                        لا توجد بيانات رواتب
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Evaluations -->
+    {% if pending_evaluations and pending_evaluations|length > 0 %}
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="card-modern">
+                <div class="card-header">
+                    <i class="bi bi-clipboard2-check-fill text-primary me-2"></i> التقييمات المعلقة
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table-modern">
+                            <thead>
+                                <tr>
+                                    <th>الموظف</th>
+                                    <th>فترة التقييم</th>
+                                    <th>الحالة</th>
+                                    <th>إجراء</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ev in pending_evaluations %}
+                                <tr>
+                                    <td>{{ ev.employee_name }}</td>
+                                    <td>{{ ev.period_name }}</td>
+                                    <td>
+                                        <span class="badge bg-warning badge-modern">{{ ev.status }}</span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('performance.evaluate_employee', employee_id=ev.id) }}" class="btn btn-sm btn-primary rounded-pill">
+                                            <i class="bi bi-pencil-fill me-1"></i> تقييم
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+{% endblock %}
+
+{% block scripts %}
+#chart javascript
+<script>
+    // Color palette
+    const colors = {
+        primary: '#0f766e',
+        primaryLight: '#14b8a6',
+        success: '#10b981',
+        warning: '#f59e0b',
+        danger: '#ef4444',
+        info: '#3b82f6',
+        purple: '#8b5cf6',
+        pink: '#ec4899'
+    };
+
+    // Chart default options
+    Chart.defaults.font.family = "'IBM Plex Sans Arabic', sans-serif";
+    Chart.defaults.font.size = 12;
+    Chart.defaults.plugins.legend.labels.usePointStyle = true;
+    Chart.defaults.plugins.legend.labels.padding = 15;
+
+    // 1. Department Distribution Chart (Doughnut)
+    const deptLabels = [{% for dept in department_data or [] %}"{{ dept.department }}",{% endfor %}];
+    const deptCounts = [{% for dept in department_data or [] %}{{ dept.count }},{% endfor %}];
+    const deptColors = ['#0f766e', '#0ea5e9', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', '#ef4444', '#14b8a6', '#6366f1'];
+
+    new Chart(document.getElementById('departmentChart'), {
+        type: 'doughnut',
+        data: {
+            labels: deptLabels,
+            datasets: [{
+                data: deptCounts,
+                backgroundColor: deptColors.slice(0, deptCounts.length),
+                borderWidth: 2,
+                borderColor: '#fff',
+                hoverOffset: 15
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = Math.round((context.raw / total) * 100);
+                            return `${context.label}: ${context.raw} موظف (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // 2. Attendance Trend Chart (Line)
+    const attendanceDates = [{% for item in attendance_trend or [] %}"{{ item.date }}",{% endfor %}];
+    const attendancePresent = [{% for item in attendance_trend or [] %}{{ item.present or 0 }},{% endfor %}];
+
+    new Chart(document.getElementById('attendanceTrendChart'), {
+        type: 'line',
+        data: {
+            labels: attendanceDates,
+            datasets: [{
+                label: 'الحاضرون',
+                data: attendancePresent,
+                borderColor: colors.success,
+                backgroundColor: colors.success + '20',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 3,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // 3. Leave Usage Chart (Bar)
+    const leaveLabels = [{% for item in leave_usage or [] %}"{{ item.leave_type }}",{% endfor %}];
+    const leaveDays = [{% for item in leave_usage or [] %}{{ item.total_days or 0 }},{% endfor %}];
+
+    new Chart(document.getElementById('leaveUsageChart'), {
+        type: 'bar',
+        data: {
+            labels: leaveLabels,
+            datasets: [{
+                label: 'عدد الأيام المستخدمة',
+                data: leaveDays,
+                backgroundColor: [colors.warning, colors.info, colors.success, colors.purple, colors.danger],
+                borderWidth: 0,
+                borderRadius: 8,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+
+    // 4. Monthly Payroll Chart (Bar)
+    const payrollMonths = [{% for item in monthly_salaries or [] %}"{{ item.month }}",{% endfor %}];
+    const payrollAmounts = [{% for item in monthly_salaries or [] %}{{ item.total or 0 }},{% endfor %}];
+
+    new Chart(document.getElementById('payrollChart'), {
+        type: 'bar',
+        data: {
+            labels: payrollMonths,
+            datasets: [{
+                label: 'إجمالي الرواتب',
+                data: payrollAmounts,
+                backgroundColor: colors.primary,
+                borderColor: colors.primary,
+                borderWidth: 1,
+                borderRadius: 8,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value.toLocaleString() + ' ر.س';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'إجمالي الرواتب: ' + context.raw.toLocaleString() + ' ر.س';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // 5. Performance Distribution Chart (Polar Area)
+    const perfLabels = [{% for item in performance_dist or [] %}"{{ item.overall_rating }}",{% endfor %}];
+    const perfCounts = [{% for item in performance_dist or [] %}{{ item.count }},{% endfor %}];
+
+    new Chart(document.getElementById('performanceChart'), {
+        type: 'polarArea',
+        data: {
+            labels: perfLabels,
+            datasets: [{
+                data: perfCounts,
+                backgroundColor: [
+                    colors.danger + '80',
+                    colors.warning + '80',
+                    colors.info + '80',
+                    colors.success + '80',
+                    colors.primary + '80'
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // 6. Department Salary Average Chart (Horizontal Bar)
+    const deptSalaryLabels = [{% for item in dept_salary_avg or [] %}"{{ item.department }}",{% endfor %}];
+    const deptSalaryValues = [{% for item in dept_salary_avg or [] %}{{ "%.0f"|format(item.avg_salary) if item.avg_salary else 0 }},{% endfor %}];
+
+    new Chart(document.getElementById('deptSalaryChart'), {
+        type: 'bar',
+        data: {
+            labels: deptSalaryLabels,
+            datasets: [{
+                label: 'متوسط الراتب',
+                data: deptSalaryValues,
+                backgroundColor: deptColors.slice(0, deptSalaryLabels.length),
+                borderRadius: 8,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value.toLocaleString() + ' ر.س';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'متوسط الراتب: ' + parseFloat(context.raw).toLocaleString() + ' ر.س';
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

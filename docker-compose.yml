@@ -1,0 +1,11 @@
+version: '3.9'
+
+services:
+  hr-system:
+    build: .
+    container_name: hr-system
+    ports:
+      - "8000:8000"
+    restart: always
+    volumes:
+      - ./data:/app/data

@@ -1,0 +1,96 @@
+2026-05-05 18:12:44,985 ERROR: Exception on /add_payroll [POST] [in C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py:875]
+Traceback (most recent call last):
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\OneDrive\Desktop\claud project\routes\employees.py", line 558, in add_payroll
+    employees = conn.execute("SELECT id, name, email FROM employees ORDER BY name LIMIT ? OFFSET ?",
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.ProgrammingError: Cannot operate on a closed database.
+2026-05-05 18:12:44,996 ERROR: Server error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application. [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:64]
+2026-05-05 18:15:25,365 INFO: HR System startup [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:38]
+2026-05-05 18:20:31,602 INFO: HR System startup [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:38]
+2026-05-05 18:20:46,828 INFO: User logged out: True [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:90]
+2026-05-05 18:20:53,123 INFO: Successful login for user: admin [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:79]
+2026-05-05 18:22:35,376 INFO: HR System startup [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:38]
+2026-05-05 18:27:08,492 INFO: HR System startup [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:38]
+2026-05-05 18:28:38,664 INFO: HR System startup [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:38]
+2026-05-05 18:37:46,719 INFO: HR System startup [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:38]
+2026-05-05 18:38:46,677 INFO: HR System startup [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:38]
+2026-05-05 18:39:55,080 INFO: HR System startup [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:38]
+2026-05-05 20:10:19,430 INFO: HR System startup [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:38]
+2026-05-05 20:11:35,639 INFO: User logged out: True [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:90]
+2026-05-05 20:14:06,224 INFO: HR System startup [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:38]
+2026-05-05 20:15:22,667 INFO: User logged out: True [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:90]
+2026-05-05 20:17:30,745 INFO: HR System startup [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:38]
+2026-05-05 20:43:11,047 INFO: HR System startup [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:38]
+2026-05-05 20:45:35,585 INFO: HR System startup [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:38]
+2026-05-05 21:03:32,971 INFO: HR System startup [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:38]
+2026-05-05 21:04:48,118 INFO: User logged out: True [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:90]
+2026-05-05 21:50:26,792 INFO: HR System startup [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:38]
+2026-05-05 21:51:35,369 INFO: User logged out: True [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:90]
+2026-05-05 22:19:07,278 INFO: HR System startup [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:38]
+2026-05-05 22:20:20,342 INFO: User logged out: True [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:90]
+2026-05-05 22:35:42,190 INFO: HR System startup [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:38]
+2026-05-05 22:36:32,777 INFO: User logged out: True [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:90]
+2026-05-05 23:05:32,590 INFO: HR System startup [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:38]
+2026-05-05 23:06:22,586 INFO: User logged out: True [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:90]
+2026-05-06 01:10:47,334 INFO: HR System startup [in c:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:38]
+2026-05-06 01:10:59,298 INFO: Successful login for user: admin [in c:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:79]
+2026-05-06 01:11:30,235 INFO: User logged out: True [in c:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:90]
+2026-05-06 01:14:48,115 INFO: HR System startup [in c:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:38]
+2026-05-06 01:15:08,762 INFO: Successful login for user: admin [in c:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:79]
+2026-05-06 01:15:13,427 ERROR: Exception on /performance/evaluate [GET] [in C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py:875]
+Traceback (most recent call last):
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\MOSTAFA\OneDrive\Desktop\claud project\routes\performance.py", line 91, in evaluation_list
+    active_period = get_active_evaluation_period()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\MOSTAFA\OneDrive\Desktop\claud project\performance_management.py", line 45, in get_active_evaluation_period
+    period = conn.execute("""
+             ^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such column: is_active
+2026-05-06 01:15:13,456 ERROR: Server error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application. [in c:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:64]
+2026-05-06 01:18:43,215 INFO: HR System startup [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:38]
+2026-05-06 01:18:54,887 ERROR: Exception on /performance/evaluate [GET] [in C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py:875]
+Traceback (most recent call last):
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\OneDrive\Desktop\claud project\routes\performance.py", line 91, in evaluation_list
+    active_period = get_active_evaluation_period()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\OneDrive\Desktop\claud project\performance_management.py", line 46, in get_active_evaluation_period
+    period = conn.execute("""
+             ^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such column: active
+2026-05-06 01:18:54,890 ERROR: Server error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application. [in C:\Users\MOSTAFA\OneDrive\Desktop\claud project\app.py:64]

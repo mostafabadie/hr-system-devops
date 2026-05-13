@@ -1,0 +1,735 @@
+{% extends "base.html" %}
+
+{% block title %}قائمة التقييمات - نظام إدارة الموارد البشرية{% endblock %}
+{% set page_size = 10 %}
+{% block content %}
+<style>
+    .page-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .page-header h1 {
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin: 0;
+    }
+    .page-header p {
+        margin: 0.25rem 0 0;
+        font-size: 0.9rem;
+        color: #64748b;
+    }
+    .filter-card,
+    .table-card {
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+        overflow: hidden;
+    }
+    .filter-card-header {
+        padding: 0.9rem 1.25rem;
+        background: #0f172a;
+        color: #e5e7eb;
+        font-size: 0.95rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .filter-card-body {
+        padding: 1.25rem 1.25rem 0.75rem;
+    }
+    .stats-card {
+        border-radius: 14px;
+        padding: 1rem 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+    }
+    .stats-card .label {
+        font-size: 0.9rem;
+        color: #64748b;
+        margin: 0;
+    }
+    .stats-card .value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+    }
+    .stats-completed {
+        background: #ecfdf3;
+        border-color: #bbf7d0;
+    }
+    .stats-draft {
+        background: #fffbeb;
+        border-color: #fed7aa;
+    }
+    .stats-missing {
+        background: #fef2f2;
+        border-color: #fecaca;
+    }
+    .stats-total {
+        background: #e6f0ff;
+        border-color: #b8d1ff;
+    }
+    .table-card .table thead th {
+        background: #0f172a;
+        color: #e5e7eb;
+        font-size: 0.85rem;
+        border-bottom: none;
+        white-space: nowrap;
+    }
+    .table-card .table tbody td {
+        vertical-align: middle;
+        font-size: 0.9rem;
+    }
+    .badge {
+        font-size: 0.8rem;
+    }
+    .btn-group .btn {
+        margin-inline-start: 2px;
+    }
+    
+    /* أنماط جديدة للبحث والتعامل مع البيانات الكبيرة */
+    .search-box {
+        background: white;
+        border-radius: 50px;
+        border: 1px solid #e2e8f0;
+        padding: 0.25rem 0.25rem 0.25rem 1rem;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .search-box input {
+        border: none;
+        outline: none;
+        padding: 0.5rem 0.75rem;
+        width: 300px;
+        font-size: 0.95rem;
+    }
+    .search-box input:focus {
+        box-shadow: none;
+    }
+    .search-box button {
+        border-radius: 50px;
+        padding: 0.5rem 1.5rem;
+        background: #0f172a;
+        color: white;
+        border: none;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    .search-box button:hover {
+        background: #1e293b;
+    }
+    
+    .search-filters {
+        background: #f8fafc;
+        padding: 1rem;
+        border-radius: 12px;
+        margin-top: 1rem;
+    }
+    
+    .advanced-search-toggle {
+        color: #0f172a;
+        cursor: pointer;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .pagination-info {
+        color: #64748b;
+        font-size: 0.9rem;
+        padding: 0.5rem 0;
+    }
+    
+    .employee-count-badge {
+        background: #0f172a;
+        color: white;
+        border-radius: 20px;
+        padding: 0.25rem 1rem;
+        font-size: 0.85rem;
+        display: inline-block;
+    }
+    
+    .quick-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin: 1rem 0;
+    }
+    
+    .quick-filter-btn {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 30px;
+        padding: 0.4rem 1rem;
+        font-size: 0.85rem;
+        color: #475569;
+        transition: all 0.2s;
+    }
+    
+    .quick-filter-btn:hover,
+    .quick-filter-btn.active {
+        background: #0f172a;
+        color: white;
+        border-color: #0f172a;
+    }
+    
+    .loading-spinner {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 9999;
+        background: rgba(255,255,255,0.9);
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .loading-spinner.show {
+        display: block;
+    }
+</style>
+
+<div class="loading-spinner" id="loadingSpinner">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">جاري التحميل...</span>
+    </div>
+    <div class="mt-2">جاري البحث في قاعدة البيانات...</div>
+</div>
+
+<div class="page-header">
+    <div>
+        <h1>📋 قائمة التقييمات</h1>
+        <p>إدارة التقييمات لـ <strong>250,000+ موظف</strong> ومتابعة حالة كل موظف.</p>
+    </div>
+    <a href="/performance" class="btn btn-outline-secondary">
+        العودة للوحة الأداء
+    </a>
+</div>
+
+<!-- فلتر الفترة التقييمية والبحث -->
+<div class="filter-card mb-4">
+    <div class="filter-card-header">
+        <span>🔍 اختيار الفترة التقييمية والبحث عن موظف</span>
+        <span class="employee-count-badge">
+            إجمالي الموظفين: {{ total_employees_count|default('250,000+') }}
+        </span>
+    </div>
+    <div class="filter-card-body">
+        <form method="GET" id="searchForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="period_id" class="form-label">الفترة التقييمية</label>
+                    <select class="form-select" id="period_id" name="period_id" onchange="this.form.submit()">
+                        <option value="">اختر الفترة التقييمية</option>
+                        {% for period in periods %}
+                        <option value="{{ period.id }}" 
+                                {% if selected_period_id == period.id %}selected{% endif %}>
+                            {{ period.name }} ({{ period.year }} - الربع {{ period.quarter }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                {% if selected_period_id %}
+                <div class="col-md-8">
+                    <label class="form-label">البحث عن موظف</label>
+                    <div class="search-box">
+                        <input type="text" 
+                               name="search" 
+                               id="employeeSearch"
+                               value="{{ search_query }}"
+                               placeholder="ابحث بالاسم، الرقم الوظيفي، القسم..."
+                               autocomplete="off">
+                        <button type="submit" onclick="showLoading()">
+                            <i class="fas fa-search"></i> بحث
+                        </button>
+                    </div>
+                    
+                    
+                    <!-- خيارات البحث المتقدم (قابلة للطي) -->
+                    
+                    <div id="advancedSearch" style="display: none;" class="search-filters mt-2">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="form-label">القسم</label>
+                                <select class="form-select" name="department">
+                                    <option value="">كل الأقسام</option>
+                                    {% for dept in departments %}
+                                    <option value="{{ dept.id }}" {% if selected_department == dept.id %}selected{% endif %}>
+                                        {{ dept.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">المنصب</label>
+                                <select class="form-select" name="position">
+                                    <option value="">كل المناصب</option>
+                                    {% for pos in positions %}
+                                    <option value="{{ pos.id }}" {% if selected_position == pos.id %}selected{% endif %}>
+                                        {{ pos.title }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">حالة التقييم</label>
+                                <select class="form-select" name="eval_status">
+                                    <option value="">الكل</option>
+                                    <option value="completed" {% if selected_eval_status == 'completed' %}selected{% endif %}>مكتمل</option>
+                                    <option value="draft" {% if selected_eval_status == 'draft' %}selected{% endif %}>مسودة</option>
+                                    <option value="pending" {% if selected_eval_status == 'pending' %}selected{% endif %}>معلق</option>
+                                    <option value="not_evaluated" {% if selected_eval_status == 'not_evaluated' %}selected{% endif %}>غير مقيّم</option>
+                                </select>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </form>
+        
+    </div>
+</div>
+
+{% if selected_period_id %}
+<!-- إحصائيات سريعة -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="stats-card stats-total">
+            <div>
+                <p class="label">إجمالي الموظفين</p>
+                <p class="value">
+                    {{ total_employees_in_period|default('0') }}
+                </p>
+            </div>
+            <span class="badge bg-primary">كل الموظفين</span>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="stats-card stats-completed">
+            <div>
+                <p class="label">تقييمات مكتملة</p>
+                <p class="value">
+                    {{ evaluations|selectattr('status', 'equalto', 'completed')|list|length }}
+                </p>
+            </div>
+            <span class="badge bg-success">مكتمل</span>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="stats-card stats-draft">
+            <div>
+                <p class="label">تقييمات مسودة</p>
+                <p class="value">
+                    {{ evaluations|selectattr('status', 'equalto', 'draft')|list|length }}
+                </p>
+            </div>
+            <span class="badge bg-warning text-dark">مسودة</span>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="stats-card stats-missing">
+            <div>
+                <p class="label">غير مقيّمين</p>
+                <p class="value">
+                    {{ total_employees_without_eval|default('0') }}
+                </p>
+            </div>
+            <span class="badge bg-danger">غير مقيّمين</span>
+        </div>
+    </div>
+</div>
+
+<!-- نتائج البحث -->
+<div class="mb-3">
+    <div class="d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+            {% if search_query %}
+            نتائج البحث عن: "{{ search_query }}"
+            <small class="text-muted">({{ total_results }} نتيجة)</small>
+            {% endif %}
+        </h5>
+        <div class="pagination-info">
+            عرض {{ start_index|default('1') }} - {{ end_index|default('0') }} من {{ total_results|default('0') }} نتيجة
+        </div>
+    </div>
+</div>
+
+<!-- قائمة الموظفين -->
+{% if employees %}
+<div class="table-card mb-4">
+    <div class="p-3 border-bottom bg-light d-flex justify-content-between align-items-center">
+        <strong>👥 قائمة الموظفين ({{ total_employees|default(employees|length) }})</strong>
+    </div>
+    <div class="p-3">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" id="employeesTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>اسم الموظف</th>
+                        <th>القسم</th>
+                        <th>المنصب</th>
+                        <th>حالة التقييم</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for employee in employees %}
+                    <tr>
+                        <td>{{ loop.index + (page-1)*page_size }}</td>
+                        <td><strong>{{ employee.name }}</strong></td>
+                        <td>{{ employee.department|default('-') }}</td>
+                        <td>{{ employee.position|default('-') }}</td>
+                        <td>
+                            {% if employee.evaluation_id %}
+                                {% if employee.evaluation_status == 'completed' %}
+                                    <span class="badge bg-success">مكتمل</span>
+                                {% elif employee.evaluation_status == 'draft' %}
+                                    <span class="badge bg-warning text-dark">مسودة</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ employee.evaluation_status }}</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="badge bg-danger">غير مقيّم</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if not employee.evaluation_id %}
+                                <a href="/performance/evaluate/{{ employee.id }}?period_id={{ selected_period_id }}" 
+                                   class="btn btn-sm btn-primary">
+                                    <i class="fas fa-plus"></i> إنشاء تقييم
+                                </a>
+                            {% elif employee.evaluation_status == 'draft' %}
+                                <a href="/performance/evaluate/{{ employee.id }}?period_id={{ selected_period_id }}" 
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-edit"></i> تعديل
+                                </a>
+                            
+                            
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- ترقيم الصفحات المحسن للبيانات الكبيرة -->
+        {% if pages and pages > 1 %}
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <div class="text-muted small">
+                عرض صفحة {{ page }} من {{ pages }}
+            </div>
+            <nav aria-label="التنقل بين الصفحات">
+                <ul class="pagination mb-0">
+                    <!-- السابق -->
+                    <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+                        <a class="page-link" 
+                           href="{% if page > 1 %}{{ url_for('performance.evaluation_list', period_id=selected_period_id, page=page-1, page_size=page_size) }}{% else %}#{% endif %}"
+                           onclick="showLoading()">
+                            السابق
+                        </a>
+                    </li>
+
+                    <!-- الصفحة الأولى -->
+                    <li class="page-item {% if page == 1 %}active{% endif %}">
+                        <a class="page-link" 
+                           href="{{ url_for('performance.evaluation_list', period_id=selected_period_id, page=1, page_size=page_size) }}"
+                           onclick="showLoading()">1</a>
+                    </li>
+
+                    <!-- نقاط قبل -->
+                    {% if page > 4 %}
+                        <li class="page-item disabled">
+                            <span class="page-link">…</span>
+                        </li>
+                    {% endif %}
+
+                    <!-- الصفحات حول الحالية -->
+                    {% for p in range(page-2, page+3) %}
+                        {% if 1 < p < pages %}
+                            <li class="page-item {% if p == page %}active{% endif %}">
+                                <a class="page-link" 
+                                   href="{{ url_for('performance.evaluation_list', period_id=selected_period_id, page=p, page_size=page_size) }}"
+                                   onclick="showLoading()">{{ p }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    <!-- نقاط بعد -->
+                    {% if page < pages - 3 %}
+                        <li class="page-item disabled">
+                            <span class="page-link">…</span>
+                        </li>
+                    {% endif %}
+
+                    <!-- الصفحة الأخيرة -->
+                    {% if pages > 1 %}
+                        <li class="page-item {% if page == pages %}active{% endif %}">
+                            <a class="page-link" 
+                               href="{{ url_for('performance.evaluation_list', period_id=selected_period_id, page=pages, page_size=page_size) }}"
+                               onclick="showLoading()">{{ pages }}</a>
+                        </li>
+                    {% endif %}
+
+                    <!-- التالي -->
+                    <li class="page-item {% if page >= pages %}disabled{% endif %}">
+                        <a class="page-link" 
+                           href="{% if page < pages %}{{ url_for('performance.evaluation_list', period_id=selected_period_id, page=page+1, page_size=page_size) }}{% else %}#{% endif %}"
+                           onclick="showLoading()">
+                            التالي
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <select class="form-select form-select-sm w-auto" onchange="changePageSize(this.value)">
+                <option value="10" {% if page_size == 10 %}selected{% endif %}>10 لكل صفحة</option>
+                <option value="20" {% if page_size == 20 %}selected{% endif %}>20 لكل صفحة</option>
+                <option value="25" {% if page_size == 25 %}selected{% endif %}>25 لكل صفحة</option>
+                <option value="50" {% if page_size == 50 %}selected{% endif %}>50 لكل صفحة</option>
+                <option value="100" {% if page_size == 100 %}selected{% endif %}>100 لكل صفحة</option>
+            </select>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<!-- التقييمات الموجودة -->
+<div class="table-card">
+    <div class="p-3 border-bottom bg-light d-flex justify-content-between align-items-center">
+        <strong>📊 التقييمات الموجودة ({{ evaluations|length }})</strong>
+        <div>
+            <button class="btn btn-sm btn-outline-secondary" onclick="exportToExcel()">
+                <i class="fas fa-file-excel"></i> تصدير Excel
+            </button>
+        </div>
+    </div>
+    <div class="p-3">
+        {% if evaluations %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>الرقم الوظيفي</th>
+                        <th>اسم الموظف</th>
+                        <th>التقييم العام</th>
+                        <th>النقاط</th>
+                        <th>الحالة</th>
+                        <th>تاريخ الإنشاء</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for evaluation in evaluations %}
+                    <tr>
+                        <td>{{ loop.index + (page-1)*page_size }}</td>
+                        <td><code>{{ evaluation.employee_id|default('EMP-'+evaluation.employee_id|string) }}</code></td>
+                        <td><strong>{{ evaluation.employee_name }}</strong></td>
+                        <td>
+                            {% if evaluation.overall_rating %}
+                                {% if evaluation.overall_rating == 'ممتاز' %}
+                                    <span class="badge bg-success">{{ evaluation.overall_rating }}</span>
+                                {% elif evaluation.overall_rating == 'جيد جداً' %}
+                                    <span class="badge bg-info">{{ evaluation.overall_rating }}</span>
+                                {% elif evaluation.overall_rating == 'جيد' %}
+                                    <span class="badge bg-primary">{{ evaluation.overall_rating }}</span>
+                                {% elif evaluation.overall_rating == 'مقبول' %}
+                                    <span class="badge bg-warning">{{ evaluation.overall_rating }}</span>
+                                {% else %}
+                                    <span class="badge bg-danger">{{ evaluation.overall_rating }}</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="badge bg-secondary">غير محدد</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if evaluation.overall_score %}
+                                <strong>{{ "%.1f"|format(evaluation.overall_score) }}</strong>/5.0
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if evaluation.status == 'completed' %}
+                                <span class="badge bg-success">مكتمل</span>
+                            {% elif evaluation.status == 'draft' %}
+                                <span class="badge bg-warning">مسودة</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ evaluation.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ evaluation.created_date[:10] }}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                            
+                                {% if evaluation.status == 'draft' %}
+                                <a href="/performance/evaluate/{{ evaluation.employee_id }}?period_id={{ selected_period_id }}" 
+                                   class="btn btn-outline-primary btn-sm" title="تحرير">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- ترقيم الصفحات للتقييمات -->
+        {% if total_pages_evaluations and total_pages_evaluations > 1 %}
+        <div class="d-flex justify-content-center mt-3">
+            <nav aria-label="التنقل بين صفحات التقييمات">
+                <ul class="pagination mb-0">
+                    <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+                        <a class="page-link" href="{% if page > 1 %}{{ url_for('performance.evaluation_list', period_id=selected_period_id, page=page-1, search=search_query) }}{% else %}#{% endif %}">السابق</a>
+                    </li>
+                    {% for p in range(1, total_pages_evaluations+1) %}
+                        {% if p <= 3 or p >= total_pages_evaluations-2 or (p >= page-2 and p <= page+2) %}
+                        <li class="page-item {% if p == page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('performance.evaluation_list', period_id=selected_period_id, page=p, search=search_query) }}">{{ p }}</a>
+                        </li>
+                        {% elif p == 4 and page > 5 %}
+                        <li class="page-item disabled"><span class="page-link">…</span></li>
+                        {% endif %}
+                    {% endfor %}
+                    <li class="page-item {% if page >= total_pages_evaluations %}disabled{% endif %}">
+                        <a class="page-link" href="{% if page < total_pages_evaluations %}{{ url_for('performance.evaluation_list', period_id=selected_period_id, page=page+1, search=search_query) }}{% else %}#{% endif %}">التالي</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+        
+        {% else %}
+        <div class="alert alert-info text-center mb-0">
+            {% if search_query %}
+            لا توجد نتائج مطابقة للبحث "{{ search_query }}"
+            {% else %}
+            لا توجد تقييمات للفترة المحددة.
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- تحسينات الأداء للبيانات الكبيرة -->
+<script>
+    let searchTimeout;
+    let loadingSpinner = document.getElementById('loadingSpinner');
+    
+    function showLoading() {
+        loadingSpinner.classList.add('show');
+    }
+    
+    function hideLoading() {
+        loadingSpinner.classList.remove('show');
+    }
+    
+    // فلترة فورية على جدول الموظفين أثناء الكتابة (بدون إعادة تحميل الصفحة)
+    const searchInputElement = document.getElementById('employeeSearch');
+    function filterEmployeesTable() {
+        const table = document.getElementById('employeesTable');
+        if (!table) return;
+        const q = (searchInputElement.value || '').trim().toLowerCase();
+        const rows = table.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+            const name = (row.cells[1]?.innerText || '').toLowerCase();
+            const dept = (row.cells[2]?.innerText || '').toLowerCase();
+            const pos  = (row.cells[3]?.innerText || '').toLowerCase();
+            const match = !q || name.includes(q) || dept.includes(q) || pos.includes(q);
+            row.style.display = match ? '' : 'none';
+        });
+    }
+    if (searchInputElement) {
+        searchInputElement.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(filterEmployeesTable, 200);
+        });
+    }
+    
+    function toggleAdvancedSearch() {
+        let advanced = document.getElementById('advancedSearch');
+        let icon = document.querySelector('.advanced-search-toggle i');
+    
+        if (advanced.style.display === 'none') {
+            advanced.style.display = 'block';
+            icon.classList.remove('fa-chevron-down');
+            icon.classList.add('fa-chevron-up');
+        } else {
+            advanced.style.display = 'none';
+            icon.classList.remove('fa-chevron-up');
+            icon.classList.add('fa-chevron-down');
+        }
+    }
+    
+    // تغيير عدد النتائج في الصفحة
+    function changePageSize(size) {
+        showLoading();
+        window.location.href =
+            "{{ url_for('performance.evaluation_list', period_id=selected_period_id) }}" +
+            "&page_size=" + size +
+            "&search={{ search_query }}" +
+            "&department={{ selected_department }}" +
+            "&position={{ selected_position }}" +
+            "&eval_status={{ selected_eval_status }}";
+    }
+    
+    // تصدير Excel
+    function exportToExcel() {
+        showLoading();
+        window.location.href =
+            "{{ url_for('performance.evaluation_list', period_id=selected_period_id) }}" +
+            "&export=excel" +
+            "&search={{ search_query }}" +
+            "&department={{ selected_department }}" +
+            "&position={{ selected_position }}";
+    }
+    
+    // إخفاء التحميل عند اكتمال الصفحة
+    window.onload = hideLoading;
+    
+    // دعم البحث بالضغط على Enter (إعادة تحميل مع بارامترات لمن يريد ذلك)
+    const searchFormEl = document.getElementById('searchForm');
+    if (searchFormEl) {
+        searchFormEl.addEventListener('submit', function(e) {
+            showLoading();
+        });
+    }
+    
+    // تحسين placeholder
+    const searchInput = document.getElementById('employeeSearch');
+    if (searchInput) {
+        searchInput.setAttribute(
+            'placeholder',
+            'ابحث بالاسم، الرقم الوظيفي، القسم... (أدخل حرفين على الأقل)'
+        );
+    }
+    </script>
+
+{% else %}
+<!-- رسالة عدم اختيار فترة -->
+<div class="alert alert-warning text-center">
+    يرجى اختيار فترة تقييمية لعرض التقييمات والبحث عن الموظفين.
+</div>
+{% endif %}
+
+{% endblock %}

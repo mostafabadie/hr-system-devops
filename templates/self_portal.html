@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}بوابة الموظف{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">مرحباً، {{ employee.name if employee else '' }}</h2>
+<p class="text-muted mb-4">يمكنك من هنا إدارة طلبات الإجازة، عرض تقييماتك، وقسائم الرواتب.</p>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <a href="{{ url_for('portal.self_request_leave') }}" class="btn btn-outline-primary w-100">
+            طلب إجازة ورؤية الرصيد
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="{{ url_for('portal.self_performance_history') }}" class="btn btn-outline-success w-100">
+            تقييمات الأداء السابقة
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="{{ url_for('portal.self_payroll') }}" class="btn btn-outline-secondary w-100">
+            قسائم الرواتب
+        </a>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="{{ url_for('portal.employee_logout') }}" class="btn btn-link text-danger">تسجيل الخروج</a>
+</div>
+{% endblock %}
+

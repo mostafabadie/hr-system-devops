@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}إدارة الرواتب{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>إدارة الرواتب</h2>
+    <div class="d-flex gap-2">
+        <a href="/payroll/export/csv" class="btn btn-outline-secondary">⬇️ تصدير CSV</a>
+        <a href="/add_payroll" class="btn btn-success">➕ إضافة راتب</a>
+    </div>
+</div>
+
+<!-- Search Form -->
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-center">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="col-md-8">
+                <label for="keyword" class="visually-hidden">بحث</label>
+                <input type="text" class="form-control" id="keyword" name="keyword"
+                       placeholder="ابحث باسم الموظف أو رقم مسير الراتب..."
+                       value="{{ keyword or '' }}">
+            </div>
+            <div class="col-md-2">
+                <select class="form-select" name="per_page" onchange="this.form.submit()">
+                    <option value="10" {% if per_page==10 %}selected{% endif %}>10</option>
+                    <option value="20" {% if per_page==20 %}selected{% endif %}>20</option>
+                    <option value="50" {% if per_page==50 %}selected{% endif %}>50</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">بحث</button>
+            </div>
+            {% if keyword %}
+            <div class="col-12">
+                <a href="/payroll" class="btn btn-sm btn-outline-secondary">مسح البحث</a>
+                <small class="text-muted">نتائج البحث عن: "{{ keyword }}"</small>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<!-- Results Info -->
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <small class="text-muted">
+        إجمالي السجلات: {{ total }} |
+        عرض {% if total > 0 %}{{ (page-1) * per_page + 1 }}{% else %}0{% endif %}
+        إلى {{ page * per_page }}
+        من {{ total }}
+    </small>
+</div>
+
+<table class="table table-striped table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>#</th>
+            <th>الموظف</th>
+            <th>الراتب الأساسي</th>
+            <th>المكافآت</th>
+            <th>الخصومات</th>
+            <th>صافي الراتب</th>
+            <th>تاريخ الدفع</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in payrolls %}
+        <tr>
+            <td>{{ p[0] }}</td>
+            <td>{{ p[1] }}</td>
+            <td>{{ p[2] }}</td>
+            <td>{{ p[3] }}</td>
+            <td>{{ p[4] }}</td>
+            <td>{{ p[5] }}</td>
+            <td>{{ p[6] }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="7" class="text-center text-muted">لا توجد بيانات رواتب حالياً</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Pagination -->
+{% if pages > 1 %}
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        <!-- First Page -->
+        <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+            <a class="page-link" href="?keyword={{ keyword or '' }}&per_page={{ per_page }}&page=1">الأولى</a>
+        </li>
+
+        <!-- Previous Page -->
+        <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+            <a class="page-link" href="?keyword={{ keyword or '' }}&per_page={{ per_page }}&page={{ page-1 }}">السابق</a>
+        </li>
+
+        <!-- Page Numbers -->
+        {% set start_page = [1, page-2] | max %}
+        {% set end_page = [pages, page+2] | min %}
+
+        {% for p in range(start_page, end_page+1) %}
+        <li class="page-item {% if p == page %}active{% endif %}">
+            <a class="page-link" href="?keyword={{ keyword or '' }}&per_page={{ per_page }}&page={{ p }}">{{ p }}</a>
+        </li>
+        {% endfor %}
+
+        <!-- Next Page -->
+        <li class="page-item {% if page >= pages %}disabled{% endif %}">
+            <a class="page-link" href="?keyword={{ keyword or '' }}&per_page={{ per_page }}&page={{ page+1 }}">التالي</a>
+        </li>
+
+        <!-- Last Page -->
+        <li class="page-item {% if page >= pages %}disabled{% endif %}">
+            <a class="page-link" href="?keyword={{ keyword or '' }}&per_page={{ per_page }}&page={{ pages }}">الأخيرة</a>
+        </li>
+    </ul>
+</nav>
+
+<div class="text-center">
+    <small class="text-muted">الصفحة {{ page }} من {{ pages }}</small>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+
+{% block title %}تسجيل دخول الموظف{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <!-- بطاقة تسجيل الدخول -->
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+                <!-- رأس البطاقة مع أيقونة -->
+                <div class="card-header bg-primary text-white text-center py-4 border-0">
+                    <div class="mb-3">
+                        <i class="fas fa-user-circle fa-4x"></i>
+                    </div>
+                    <h3 class="fw-bold mb-0">تسجيل دخول الموظف</h3>
+                    <p class="small opacity-75 mt-2 mb-0">الرجاء إدخال بيانات الدخول الخاصة بك</p>
+                </div>
+                
+                <!-- جسم البطاقة - النموذج -->
+                <div class="card-body p-4">
+                    <form method="post" class="needs-validation" novalidate>
+    <!-- CSRF Protection -->
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <!-- حقل اسم المستخدم -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">
+                                <i class="fas fa-user ms-2 text-primary"></i>
+                                اسم المستخدم
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="fas fa-user text-primary"></i>
+                                </span>
+                                <input type="text"
+                                       name="username"
+                                       id="username"
+                                       class="form-control border-start-0 ps-0"
+                                       placeholder="أدخل اسم المستخدم"
+                                       required
+                                       autofocus>
+                                <div class="invalid-feedback" id="usernameFeedback">
+                                    الرجاء إدخال اسم المستخدم
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- حقل كلمة المرور -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">
+                                <i class="fas fa-lock ms-2 text-primary"></i>
+                                كلمة المرور
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="fas fa-key text-primary"></i>
+                                </span>
+                                <input type="password" 
+                                       name="password" 
+                                       class="form-control border-start-0 ps-0" 
+                                       placeholder="أدخل كلمة المرور"
+                                       required
+                                       id="passwordInput">
+                                <button class="btn btn-outline-secondary border"
+                                        type="button"
+                                        id="togglePassword"
+                                        onclick="togglePasswordVisibility()"
+                                        aria-label="إظهار أو إخفاء كلمة المرور"
+                                        aria-pressed="false">
+                                    <i class="fas fa-eye" id="togglePasswordIcon"></i>
+                                </button>
+                                <div class="invalid-feedback" id="passwordFeedback">
+                                    الرجاء إدخال كلمة المرور
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- خيارات إضافية -->
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="rememberMe" name="remember">
+                                <label class="form-check-label small" for="rememberMe">
+                                    تذكرني
+                                </label>
+                            </div>
+                            <a href="#" class="text-decoration-none small">
+                                نسيت كلمة المرور؟
+                            </a>
+                        </div>
+                        
+                        <!-- عرض رسالة الخطأ -->
+                        {% if error %}
+                        <div class="alert alert-danger alert-dismissible fade show py-2 d-flex align-items-center" role="alert">
+                            <i class="fas fa-exclamation-circle ms-2"></i>
+                            <div>{{ error }}</div>
+                            <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- زر الدخول -->
+                        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-3 mb-3" id="submitBtn">
+                            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true" id="submitSpinner"></span>
+                            <span id="submitText">
+                                <i class="fas fa-sign-in-alt ms-2"></i>
+                                دخول
+                            </span>
+                        </button>
+                        
+                        <!-- رسالة المساعدة -->
+                        <div class="text-center small text-muted">
+                            <i class="fas fa-shield-alt ms-1"></i>
+                            هذا الموقع آمن ومحمي
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- تذييل البطاقة -->
+                <div class="card-footer bg-light text-center py-3 border-0">
+                    <p class="small text-muted mb-0">
+                        جميع الحقوق محفوظة © 2026
+                    </p>
+                </div>
+            </div>
+            <!-- رابط العودة إلى الصفحة الرئيسية -->
+            <div class="text-center mt-3">
+                <a href="/" class="text-muted small text-decoration-none">
+                    <i class="fas fa-arrow-right ms-1"></i>
+                    العودة إلى الصفحة الرئيسية
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- إضافة سكريبت لإظهار/إخفاء كلمة المرور -->
+<script>
+// Toggle password visibility with ARIA support
+function togglePasswordVisibility() {
+    const passwordInput = document.getElementById('passwordInput');
+    const toggleIcon = document.getElementById('togglePasswordIcon');
+    const toggleButton = document.getElementById('togglePassword');
+
+    const isPassword = passwordInput.type === 'password';
+    passwordInput.type = isPassword ? 'text' : 'password';
+    toggleIcon.classList.toggle('fa-eye', !isPassword);
+    toggleIcon.classList.toggle('fa-eye-slash', isPassword);
+    toggleButton.setAttribute('aria-pressed', isPassword.toString());
+}
+
+// Real-time validation for input fields
+function setupRealTimeValidation(inputId) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+
+    input.addEventListener('input', function() {
+        if (this.checkValidity() && this.value.trim() !== '') {
+            this.classList.remove('is-invalid');
+            this.classList.add('is-valid');
+        } else if (this.value.trim() === '') {
+            this.classList.remove('is-valid', 'is-invalid');
+        } else {
+            this.classList.remove('is-valid');
+            this.classList.add('is-invalid');
+        }
+    });
+
+    input.addEventListener('blur', function() {
+        if (this.value.trim() === '') {
+            this.classList.remove('is-valid', 'is-invalid');
+        }
+    });
+}
+
+// Handle form submission with loading state
+function setupFormSubmission() {
+    const form = document.querySelector('.needs-validation');
+    const submitBtn = document.getElementById('submitBtn');
+    const submitSpinner = document.getElementById('submitSpinner');
+    const submitText = document.getElementById('submitText');
+
+    if (!form || !submitBtn) return;
+
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        } else {
+            // Show loading state
+            submitBtn.disabled = true;
+            submitSpinner.classList.remove('d-none');
+            submitText.classList.add('d-none');
+        }
+        form.classList.add('was-validated');
+    }, false);
+}
+
+// Initialize all enhancements on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Setup real-time validation for inputs
+    setupRealTimeValidation('username');
+    setupRealTimeValidation('passwordInput');
+
+    // Setup form submission loading state
+    setupFormSubmission();
+
+    // Enhanced Bootstrap form validation
+    (function() {
+        'use strict';
+        const forms = document.querySelectorAll('.needs-validation');
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+});
+</script>
+
+<style>
+/* تحسينات إضافية */
+.card {
+    transition: transform 0.3s ease;
+}
+.card:hover {
+    transform: translateY(-5px);
+}
+.input-group-text {
+    background-color: #f8f9fa;
+}
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+.btn-primary {
+    transition: all 0.3s ease;
+}
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+}
+</style>
+{% endblock %}

@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}نظام إدارة الموارد البشرية{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/static/manifest.json">
+    <!-- Theme color for browser UI -->
+    <meta name="theme-color" content="#0f766e">
+    <!-- Apple touch icons -->
+    <link rel="apple-touch-icon" href="/static/icons/icon-192x192.png">
+
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --sidebar-collapsed-width: 70px;
+            --primary: #0f766e;
+            --primary-light: #14b8a6;
+            --primary-dark: #134e4a;
+            --surface: #f8fafc;
+            --surface-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'IBM Plex Sans Arabic', 'Tahoma', sans-serif;
+            background: var(--surface);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* ===== Sidebar ===== */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(180deg, var(--primary-dark) 0%, var(--primary) 100%);
+            color: white;
+            z-index: 1040;
+            transition: width 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.15);
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .sidebar-header {
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            min-height: 70px;
+        }
+
+        .sidebar-logo {
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand {
+            font-weight: 600;
+            font-size: 1rem;
+            white-space: nowrap;
+            opacity: 1;
+            transition: opacity 0.2s;
+        }
+
+        .sidebar.collapsed .sidebar-brand { opacity: 0; width: 0; overflow: hidden; }
+
+        .sidebar-toggle {
+            position: absolute;
+            left: -12px;
+            top: 20px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border: none;
+            border-radius: 50%;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            z-index: 1041;
+            font-size: 0.7rem;
+            transition: transform 0.3s;
+        }
+
+        .sidebar.collapsed .sidebar-toggle { transform: rotate(180deg); }
+
+        .sidebar-menu {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 0.75rem 0.5rem;
+        }
+
+        .sidebar-menu::-webkit-scrollbar { width: 4px; }
+        .sidebar-menu::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+
+        .nav-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: rgba(255,255,255,0.5);
+            padding: 0.75rem 0.75rem 0.35rem;
+            white-space: nowrap;
+        }
+
+        .sidebar.collapsed .nav-label { text-align: center; padding: 0.5rem 0; font-size: 0; }
+        .sidebar.collapsed .nav-label::after { content: '...'; font-size: 0.7rem; }
+
+        .nav-item-sidebar {
+            margin-bottom: 2px;
+        }
+
+        .nav-link-sidebar {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.65rem 0.75rem;
+            color: rgba(255,255,255,0.75);
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.2s;
+            white-space: nowrap;
+            font-size: 0.9rem;
+        }
+
+        .nav-link-sidebar:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .nav-link-sidebar.active {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            font-weight: 500;
+        }
+
+        .nav-link-sidebar i {
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar.collapsed .nav-link-sidebar { justify-content: center; padding: 0.65rem 0; }
+        .sidebar.collapsed .nav-link-sidebar span { display: none; }
+
+        .sidebar-footer {
+            padding: 0.75rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar.collapsed .sidebar-footer { display: flex; justify-content: center; }
+
+        .btn-logout {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            background: rgba(239,68,68,0.2);
+            color: #fca5a5;
+            border: 1px solid rgba(239,68,68,0.3);
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover { background: rgba(239,68,68,0.35); color: white; }
+        .sidebar.collapsed .btn-logout { justify-content: center; padding: 0.6rem; }
+        .sidebar.collapsed .btn-logout span { display: none; }
+
+        /* ===== Main Content ===== */
+        .main-wrapper {
+            margin-right: var(--sidebar-width);
+            min-height: 100vh;
+            transition: margin-right 0.3s ease;
+        }
+
+        .sidebar.collapsed ~ .main-wrapper {
+            margin-right: var(--sidebar-collapsed-width);
+        }
+
+        .top-bar {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1020;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .page-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .top-bar-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .content-wrapper {
+            padding: 1.5rem;
+            max-width: 1400px;
+        }
+
+        /* ===== Cards ===== */
+        .card-modern {
+            background: var(--surface-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            transition: box-shadow 0.2s;
+            overflow: hidden;
+        }
+
+        .card-modern:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .card-modern .card-header {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 1.25rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border-radius: 16px 16px 0 0 !important;
+        }
+
+        .card-modern .card-body { padding: 1.25rem; }
+
+        /* ===== KPI Cards ===== */
+        .kpi-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.25rem;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .kpi-card.primary::before { background: var(--primary); }
+        .kpi-card.success::before { background: var(--success); }
+        .kpi-card.warning::before { background: var(--warning); }
+        .kpi-card.danger::before { background: var(--danger); }
+        .kpi-card.info::before { background: var(--info); }
+        .kpi-card.purple::before { background: #8b5cf6; }
+
+        .kpi-icon-wrapper {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .kpi-card.primary .kpi-icon-wrapper { background: #f0fdfa; color: var(--primary); }
+        .kpi-card.success .kpi-icon-wrapper { background: #ecfdf5; color: var(--success); }
+        .kpi-card.warning .kpi-icon-wrapper { background: #fffbeb; color: var(--warning); }
+        .kpi-card.danger .kpi-icon-wrapper { background: #fef2f2; color: var(--danger); }
+        .kpi-card.info .kpi-icon-wrapper { background: #eff6ff; color: var(--info); }
+        .kpi-card.purple .kpi-icon-wrapper { background: #f5f3ff; color: #8b5cf6; }
+
+        .kpi-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--text-main);
+        }
+
+        .kpi-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .kpi-trend {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* ===== Tables ===== */
+        .table-modern {
+            margin: 0;
+        }
+
+        .table-modern thead th {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            padding: 0.75rem 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .table-modern tbody td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        .table-modern tbody tr:last-child td { border-bottom: none; }
+        .table-modern tbody tr:hover { background: var(--surface); }
+
+        /* ===== Badges ===== */
+        .badge-modern {
+            padding: 0.35em 0.75em;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* ===== Chart containers ===== */
+        .chart-container {
+            position: relative;
+            height: 280px;
+            padding: 1rem;
+        }
+
+        /* ===== Section Title ===== */
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin: 1.5rem 0 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title:first-child { margin-top: 0; }
+
+        /* ===== Alerts ===== */
+        .alert-modern {
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            border-right: 4px solid;
+        }
+
+        .alert-modern.alert-success { background: #f0fdfa; border-right-color: var(--success); color: #065f46; }
+        .alert-modern.alert-danger { background: #fef2f2; border-right-color: var(--danger); color: #991b1b; }
+        .alert-modern.alert-warning { background: #fffbeb; border-right-color: var(--warning); color: #92400e; }
+        .alert-modern.alert-info { background: #eff6ff; border-right-color: var(--info); color: #1e40af; }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            .sidebar { width: var(--sidebar-collapsed-width); }
+            .sidebar .sidebar-brand,
+            .sidebar .nav-link-sidebar span,
+            .sidebar .nav-label,
+            .sidebar .btn-logout span { display: none; }
+            .sidebar .nav-link-sidebar { justify-content: center; padding: 0.65rem 0; }
+            .sidebar .sidebar-header { justify-content: center; }
+            .main-wrapper { margin-right: var(--sidebar-collapsed-width); }
+            .content-wrapper { padding: 1rem; }
+            .kpi-value { font-size: 1.4rem; }
+        }
+
+        /* ===== Touch-friendly adjustments ===== */
+        @media (hover: none) {
+            .btn, .nav-link-sidebar, .action-card, .today-stat-card, .kpi-card, .table-modern th, .table-modern td, .btn-action, .btn-add, .btn-logout {
+                min-height: 48px;
+                min-width: 48px;
+            }
+            .nav-link-sidebar, .action-card, .today-stat-card, .kpi-card {
+                padding: 1rem;
+            }
+            .table-modern th, .table-modern td {
+                padding: 1rem;
+            }
+            .sidebar .nav-link-sidebar {
+                padding: 0.75rem 0;
+            }
+            .sidebar.collapsed .nav-link-sidebar {
+                padding: 0.75rem 0;
+            }
+            .form-control, .form-select {
+                min-height: 48px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">HR</div>
+            <span class="sidebar-brand">نظام الموارد البشرية</span>
+        </div>
+        <button class="sidebar-toggle" onclick="toggleSidebar()">
+            <i class="bi bi-chevron-right"></i>
+        </button>
+
+        <div class="sidebar-menu">
+            <div class="nav-label">الرئيسية</div>
+            <div class="nav-item-sidebar">
+                <a class="nav-link-sidebar {% if request.path == '/' %}active{% endif %}" href="/">
+                    <i class="bi bi-house-door"></i>
+                    <span>الرئيسية</span>
+                </a>
+                <div class="nav-item-sidebar">
+                    <a class="nav-link-sidebar" href="/employee/login">
+                        <i class="bi bi-person-circle"></i>
+                        <span>بوابة الموظف</span>
+                    </a>
+                </div>
+            </div>
+            <div class="nav-item-sidebar">
+                <a class="nav-link-sidebar {% if '/dashboard' in request.path %}active{% endif %}" href="/dashboard">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>لوحة التحكم</span>
+                </a>
+            </div>
+            
+
+            <div class="nav-label">إدارة الموظفين</div>
+            <div class="nav-item-sidebar">
+                <a class="nav-link-sidebar {% if '/employees' in request.path and '/add' not in request.path and '/edit' not in request.path %}active{% endif %}" href="/employees">
+                    <i class="bi bi-people"></i>
+                    <span>الموظفين</span>
+                </a>
+            </div>
+            <div class="nav-item-sidebar">
+                <a class="nav-link-sidebar {% if '/attendance' in request.path %}active{% endif %}" href="/attendance">
+                    <i class="bi bi-calendar-check"></i>
+                    <span>الحضور والغياب</span>
+                </a>
+            </div>
+            <div class="nav-item-sidebar">
+                <a class="nav-link-sidebar {% if '/payroll' in request.path %}active{% endif %}" href="/payroll">
+                    <i class="bi bi-cash-stack"></i>
+                    <span>الرواتب</span>
+                </a>
+            </div>
+
+            <div class="nav-label">الإجازات</div>
+            <div class="nav-item-sidebar">
+                <a class="nav-link-sidebar {% if '/leaves/request' == request.path %}active{% endif %}" href="/leaves/request">
+                    <i class="bi bi-plus-circle"></i>
+                    <span>طلب إجازة</span>
+                </a>
+            </div>
+            <div class="nav-item-sidebar">
+                <a class="nav-link-sidebar {% if '/leaves/pending' in request.path %}active{% endif %}" href="/leaves/pending">
+                    <i class="bi bi-hourglass-split"></i>
+                    <span>الطلبات المعلقة</span>
+                </a>
+            </div>
+            <div class="nav-item-sidebar">
+                <a class="nav-link-sidebar {% if '/leaves' in request.path and '/request' not in request.path and '/pending' not in request.path %}active{% endif %}" href="/leaves">
+                    <i class="bi bi-calendar-x"></i>
+                    <span>جميع الطلبات</span>
+                </a>
+            </div>
+
+            <div class="nav-label">الأداء</div>
+            <div class="nav-item-sidebar">
+                <a class="nav-link-sidebar {% if '/performance' == request.path %}active{% endif %}" href="/performance">
+                    <i class="bi bi-bar-chart"></i>
+                    <span>لوحة الأداء</span>
+                </a>
+            </div>
+            <div class="nav-item-sidebar">
+                <a class="nav-link-sidebar {% if '/performance/evaluate' in request.path and 'submit' not in request.path %}active{% endif %}" href="/performance/evaluate">
+                    <i class="bi bi-clipboard-check"></i>
+                    <span>التقييمات</span>
+                </a>
+            </div>
+            <div class="nav-item-sidebar">
+                <a class="nav-link-sidebar {% if '/performance/periods' in request.path %}active{% endif %}" href="/performance/periods">
+                    <i class="bi bi-calendar-week"></i>
+                    <span>الفترات التقييمية</span>
+                </a>
+            </div>
+
+           
+          
+        
+
+        <div class="sidebar-footer">
+            <a class="btn-logout" href="/logout">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>تسجيل خروج</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-wrapper">
+        <div class="top-bar">
+            <h1 class="page-title">{% block page_title %}نظام إدارة الموارد البشرية{% endblock %}</h1>
+            <div class="top-bar-actions">
+                <span class="text-muted" style="font-size: 0.85rem;">
+                    <i class="bi bi-calendar3"></i>
+                    {{ now().strftime('%Y-%m-%d') if now else '' }}
+                </span>
+            </div>
+        </div>
+
+        <div class="content-wrapper">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert-modern alert-{{ 'success' if category == 'success' else 'danger' if category == 'error' else 'warning' if category == 'warning' else 'info' }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+            localStorage.setItem('sidebar-collapsed', document.getElementById('sidebar').classList.contains('collapsed'));
+        }
+
+        // Restore sidebar state
+        if (localStorage.getItem('sidebar-collapsed') === 'true') {
+            document.getElementById('sidebar').classList.add('collapsed');
+        }
+
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/serviceworker.js')
+                    .then((registration) => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.log('ServiceWorker registration failed: ', error);
+                    });
+            });
+        }
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,100 @@
+2026-05-10 17:59:46,194 ERROR: Exception on /admin/ [GET] [in C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py:875]
+Traceback (most recent call last):
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask_restx\api.py", line 677, in error_router
+    return original_handler(e)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Download\HR-System-2-project-main\HR-System-2-project-main\admin\dashboard.py", line 144, in admin_dashboard
+    return render_template('admin/dashboard.html',
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\jinja2\environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\jinja2\environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\jinja2\environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\jinja2\loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\jinja2\environment.py", line 771, in compile
+    self.handle_exception(source=source_hint)
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\Download\HR-System-2-project-main\HR-System-2-project-main\templates\admin\dashboard.html", line 3, in template
+    {% block page_title }}{% endblock %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.TemplateSyntaxError: unexpected '}'
+2026-05-10 17:59:46,304 ERROR: Server error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application. [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:70]
+2026-05-10 18:01:58,411 INFO: HR System startup [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:37]
+2026-05-10 18:19:16,201 INFO: HR System startup [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:37]
+2026-05-10 18:19:54,289 INFO: HR System startup [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:37]
+2026-05-10 18:20:07,535 INFO: HR System startup [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:37]
+2026-05-10 18:21:30,644 INFO: HR System startup [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:37]
+2026-05-10 18:22:50,558 INFO: HR System startup [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:37]
+2026-05-10 18:25:30,197 INFO: HR System startup [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:37]
+2026-05-10 18:25:52,767 INFO: HR System startup [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:37]
+2026-05-10 18:28:58,836 INFO: HR System startup [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:37]
+2026-05-10 18:29:33,901 INFO: HR System startup [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:37]
+2026-05-10 18:30:12,637 INFO: HR System startup [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:37]
+2026-05-10 23:42:45,933 INFO: HR System startup [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:37]
+2026-05-10 23:42:58,210 INFO: Successful login for user: admin [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:85]
+2026-05-11 02:19:55,523 INFO: HR System startup [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:37]
+2026-05-11 02:20:04,384 INFO: Successful login for user: admin [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:85]
+2026-05-11 02:42:53,946 INFO: HR System startup [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:37]
+2026-05-11 02:42:59,819 ERROR: Exception on /dashboard [GET] [in C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py:875]
+Traceback (most recent call last):
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask_restx\api.py", line 677, in error_router
+    return original_handler(e)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Download\HR-System-2-project-main\HR-System-2-project-main\routes\reports.py", line 160, in dashboard
+    return render_template('dashboard.html',
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "C:\Users\MOSTAFA\AppData\Local\Programs\Python\Python311\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\Download\HR-System-2-project-main\HR-System-2-project-main\templates\dashboard.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "D:\Download\HR-System-2-project-main\HR-System-2-project-main\templates\base.html", line 585, in top-level template code
+    {% block content %}
+  File "D:\Download\HR-System-2-project-main\HR-System-2-project-main\templates\dashboard.html", line 266, in block 'content'
+    {% if dept.total_records > 0 %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.UndefinedError: 'sqlite3.Row object' has no attribute 'total_records'
+2026-05-11 02:42:59,865 ERROR: Server error: 500 Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application. [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:70]
+2026-05-11 02:45:20,556 INFO: HR System startup [in D:\Download\HR-System-2-project-main\HR-System-2-project-main\app.py:37]

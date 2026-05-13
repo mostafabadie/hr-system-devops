@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}جميع طلبات الإجازة{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+<h2 class="mb-4">جميع طلبات الإجازة</h2>
+
+{% if requests %}
+
+<table class="table table-bordered table-striped">
+<thead>
+<tr>
+<th>الموظف</th>
+<th>نوع الإجازة</th>
+<th>تاريخ البداية</th>
+<th>تاريخ النهاية</th>
+<th>عدد الأيام</th>
+<th>الحالة</th>
+<th>تاريخ الطلب</th>
+<th>المعتمد</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for request in requests %}
+
+<tr>
+
+<td>{{ request.employee_name }}</td>
+
+<td>{{ request.leave_type_name }}</td>
+
+<td>{{ request.start_date }}</td>
+
+<td>{{ request.end_date }}</td>
+
+<td>{{ request.days_requested }}</td>
+
+<td>
+
+{% if request.status == 'pending' %}
+<span class="badge bg-warning">معلق</span>
+
+{% elif request.status == 'approved' %}
+<span class="badge bg-success">موافق</span>
+
+{% elif request.status == 'rejected' %}
+<span class="badge bg-danger">مرفوض</span>
+{% endif %}
+
+</td>
+
+<td>{{ request.request_date }}</td>
+
+<td>
+{% if request.approved_by_name %}
+{{ "Admin" }}
+{% else %}
+-
+{% endif %}
+</td>
+
+
+
+{% if request.status == 'pending' %}
+
+<a href="/approve_leave/{{ request.id }}" class="btn btn-sm btn-success">
+موافقة
+</a>
+
+<a href="/reject_leave/{{ request.id }}" class="btn btn-sm btn-danger">
+رفض
+</a>
+
+{% endif %}
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+</table>
+
+{% else %}
+
+<div class="alert alert-info">
+لا توجد طلبات إجازة حالياً
+</div>
+
+{% endif %}
+
+</div>
+
+{% endblock %}

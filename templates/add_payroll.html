@@ -1,0 +1,725 @@
+{% extends "base.html" %}
+
+{% block title %}إضافة راتب{% endblock %}
+
+{% block content %}
+<style>
+    .page-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 2rem;
+    }
+    .page-header h2 {
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin: 0;
+        color: #0f172a;
+    }
+    .page-header .icon-circle {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #0f766e, #0d9488);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.3rem;
+        box-shadow: 0 8px 20px rgba(15, 118, 110, 0.35);
+        flex-shrink: 0;
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.82);
+        backdrop-filter: blur(12px);
+        border-radius: 20px;
+        border: 1px solid rgba(226, 232, 240, 0.85);
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.10);
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .glass-card .card-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .glass-card .card-title i {
+        color: #0f766e;
+    }
+
+    /* Search Box */
+    .search-box {
+        position: relative;
+    }
+    .search-box .bi {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 1.1rem;
+        pointer-events: none;
+        z-index: 2;
+    }
+    .search-box input {
+        padding-left: 2.8rem;
+        border-radius: 14px;
+        border: 1.5px solid #e2e8f0;
+        transition: all 0.2s;
+    }
+    .search-box input:focus {
+        border-color: #0f766e;
+        box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
+    }
+
+    /* Employee Select Hidden */
+    #employeeSelect {
+        display: none;
+    }
+
+    /* Custom Dropdown */
+    .custom-dropdown {
+        position: relative;
+    }
+    .dropdown-display {
+        width: 100%;
+        padding: 0.65rem 1rem;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 14px;
+        background: white;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.95rem;
+        color: #334155;
+        transition: all 0.2s;
+        min-height: 44px;
+    }
+    .dropdown-display:hover {
+        border-color: #0f766e;
+    }
+    .dropdown-display.active {
+        border-color: #0f766e;
+        box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
+    }
+    .dropdown-display .placeholder {
+        color: #94a3b8;
+    }
+    .dropdown-menu-custom {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.15);
+        max-height: 260px;
+        overflow-y: auto;
+        z-index: 1000;
+        display: none;
+    }
+    .dropdown-menu-custom.show {
+        display: block;
+        animation: slideDown 0.2s ease;
+    }
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .dropdown-item-custom {
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: background 0.15s;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .dropdown-item-custom:last-child {
+        border-bottom: none;
+    }
+    .dropdown-item-custom:hover {
+        background: #ecfdf5;
+    }
+    .dropdown-item-custom .emp-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #0f766e, #0d9488);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.85rem;
+        flex-shrink: 0;
+    }
+    .dropdown-item-custom .emp-info {
+        flex: 1;
+        min-width: 0;
+    }
+    .dropdown-item-custom .emp-name {
+        font-weight: 600;
+        color: #0f172a;
+        font-size: 0.9rem;
+    }
+    .dropdown-item-custom .emp-email {
+        font-size: 0.8rem;
+        color: #64748b;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .dropdown-item-custom .emp-dept {
+        font-size: 0.75rem;
+        color: #0f766e;
+        font-weight: 600;
+    }
+    .dropdown-empty {
+        padding: 1.5rem;
+        text-align: center;
+        color: #94a3b8;
+        font-size: 0.9rem;
+    }
+
+    /* Form Controls */
+    .form-label-modern {
+        font-weight: 600;
+        color: #334155;
+        font-size: 0.9rem;
+        margin-bottom: 0.4rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+    .form-label-modern i {
+        color: #0f766e;
+        font-size: 0.9rem;
+    }
+    .form-control-modern {
+        border: 1.5px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 0.65rem 1rem;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+        background: white;
+    }
+    .form-control-modern:focus {
+        border-color: #0f766e;
+        box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
+        outline: none;
+    }
+
+    /* Salary Preview */
+    .salary-preview {
+        background: linear-gradient(135deg, #0f766e, #0d9488);
+        border-radius: 20px;
+        padding: 1.75rem;
+        color: white;
+        margin-bottom: 1.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .salary-preview::before {
+        content: '';
+        position: absolute;
+        top: -30px;
+        right: -30px;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.1);
+    }
+    .salary-preview .preview-title {
+        font-size: 0.9rem;
+        opacity: 0.85;
+        margin-bottom: 0.5rem;
+    }
+    .salary-preview .preview-amount {
+        font-size: 2rem;
+        font-weight: 800;
+        line-height: 1.2;
+    }
+    .salary-preview .preview-breakdown {
+        display: flex;
+        gap: 1.5rem;
+        margin-top: 1rem;
+        font-size: 0.85rem;
+        opacity: 0.9;
+        flex-wrap: wrap;
+    }
+    .salary-preview .preview-breakdown span {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    /* Payroll Items */
+    .payroll-items-container {
+        border: 1.5px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 1rem;
+        background: #f8fafc;
+    }
+    .payroll-item-row {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        padding: 0.75rem;
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s;
+    }
+    .payroll-item-row:hover {
+        border-color: #0f766e;
+        box-shadow: 0 4px 12px rgba(15, 118, 110, 0.1);
+    }
+    .payroll-item-row .item-type {
+        min-width: 110px;
+    }
+    .payroll-item-row .item-label {
+        flex: 1;
+    }
+    .payroll-item-row .item-amount {
+        width: 140px;
+    }
+    .payroll-item-row .item-remove {
+        flex-shrink: 0;
+    }
+    .payroll-item-row .badge-allowance {
+        background: #dcfce7;
+        color: #166534;
+        padding: 0.2em 0.6em;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .payroll-item-row .badge-deduction {
+        background: #fee2e2;
+        color: #991b1b;
+        padding: 0.2em 0.6em;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    /* Submit Button */
+    .btn-submit-modern {
+        background: linear-gradient(135deg, #0f766e, #0d9488);
+        color: white;
+        border: none;
+        border-radius: 14px;
+        padding: 0.85rem 2rem;
+        font-size: 1rem;
+        font-weight: 700;
+        width: 100%;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 8px 25px rgba(15, 118, 110, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+    }
+    .btn-submit-modern:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 35px rgba(15, 118, 110, 0.5);
+        color: white;
+    }
+    .btn-submit-modern:active {
+        transform: translateY(0);
+    }
+
+    /* Add Item Button */
+    .btn-add-item {
+        background: rgba(15, 118, 110, 0.08);
+        color: #0f766e;
+        border: 1.5px dashed #0f766e;
+        border-radius: 12px;
+        padding: 0.6rem 1.2rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .btn-add-item:hover {
+        background: rgba(15, 118, 110, 0.15);
+    }
+
+    /* Form text */
+    .form-text-modern {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-top: 0.3rem;
+    }
+
+    @media (max-width: 768px) {
+        .glass-card { padding: 1.25rem; }
+        .salary-preview .preview-amount { font-size: 1.5rem; }
+        .payroll-item-row {
+            flex-wrap: wrap;
+        }
+        .payroll-item-row .item-type,
+        .payroll-item-row .item-label,
+        .payroll-item-row .item-amount {
+            width: 100%;
+            flex: 1 1 100%;
+        }
+    }
+</style>
+
+<div class="container mt-4">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="icon-circle">
+            <i class="bi bi-cash-stack"></i>
+        </div>
+        <div>
+            <h2>إضافة راتب</h2>
+            <p class="page-subtitle" style="margin:0; color:#64748b; font-size:0.9rem;">
+                تسجيل راتب جديد لموظف مع إمكانية إضافة البدلات والخصومات
+            </p>
+        </div>
+    </div>
+
+    <!-- Salary Preview Card -->
+    <div class="salary-preview" id="salaryPreview">
+        <div class="preview-title">💰 صافي الراتب المتوقع</div>
+        <div class="preview-amount" id="netSalaryDisplay">0 ر.س</div>
+        <div class="preview-breakdown">
+            <span>📊 الأساسي: <strong id="baseDisplay">0</strong></span>
+            <span>⬆️ البدلات: <strong id="allowanceDisplay">0</strong></span>
+            <span>⬇️ الخصومات: <strong id="deductionDisplay">0</strong></span>
+        </div>
+    </div>
+
+    <form method="POST" id="payrollForm" class="glass-card">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="card-title"><i class="bi bi-person-badge"></i> بيانات الموظف</div>
+
+        <!-- Employee Search -->
+        <div class="mb-3">
+            <label class="form-label-modern"><i class="bi bi-search"></i> البحث عن الموظف</label>
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text"
+                       id="employeeSearch"
+                       class="form-control form-control-modern"
+                       placeholder="اكتب الاسم أو البريد الإلكتروني للبحث..."
+                       autocomplete="off">
+            </div>
+            <div class="form-text-modern">سيتم تحديد الموظف تلقائياً عند المطابقة</div>
+        </div>
+
+        <!-- Custom Employee Dropdown -->
+        <div class="mb-4">
+            <label class="form-label-modern"><i class="bi bi-people"></i> اختيار الموظف</label>
+            <div class="custom-dropdown" id="customDropdown">
+                <div class="dropdown-display" id="dropdownDisplay">
+                    <span class="placeholder">-- اختر الموظف --</span>
+                    <i class="bi bi-chevron-down"></i>
+                </div>
+                <div class="dropdown-menu-custom" id="dropdownMenu">
+                    <div class="dropdown-empty" id="dropdownEmpty">ابدأ بالكتابة للبحث عن موظف...</div>
+                </div>
+            </div>
+            <select name="employee_id" id="employeeSelect" required>
+                <option value="">-- اختر الموظف --</option>
+            </select>
+        </div>
+
+        <hr style="margin: 1.5rem 0; border-color: #e2e8f0;">
+
+        <div class="card-title"><i class="bi bi-cash-coin"></i> تفاصيل الراتب</div>
+
+        <!-- Salary -->
+        <div class="row g-3 mb-3">
+            <div class="col-md-4">
+                <label class="form-label-modern"><i class="bi bi-currency-dollar"></i> الراتب الأساسي</label>
+                <input type="number" step="0.01" name="salary" id="salaryInput"
+                       class="form-control form-control-modern" placeholder="0.00" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label-modern"><i class="bi bi-arrow-up-circle"></i> المكافآت</label>
+                <input type="number" step="0.01" name="bonus" id="bonusInput"
+                       class="form-control form-control-modern" value="0" placeholder="0.00">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label-modern"><i class="bi bi-arrow-down-circle"></i> الخصومات الأساسية</label>
+                <input type="number" step="0.01" name="deductions" id="deductionsInput"
+                       class="form-control form-control-modern" value="0" placeholder="0.00">
+            </div>
+        </div>
+
+        <!-- Payment Date -->
+        <div class="mb-4">
+            <label class="form-label-modern"><i class="bi bi-calendar-check"></i> تاريخ الدفع</label>
+            <input type="date" name="payment_date" class="form-control form-control-modern" required>
+        </div>
+
+        <hr style="margin: 1.5rem 0; border-color: #e2e8f0;">
+
+        <div class="card-title"><i class="bi bi-list-ul"></i> بنود إضافية (بدلات / خصومات)</div>
+
+        <!-- Payroll Items -->
+        <div class="mb-3">
+            <div class="payroll-items-container">
+                <div id="itemsContainer"></div>
+                <button type="button" class="btn-add-item mt-2" onclick="addPayrollItem()">
+                    <i class="bi bi-plus-circle"></i> إضافة بند
+                </button>
+                <div class="form-text-modern mt-2">مثال: بدل مواصلات (بدل) / خصم تأخير (خصم)</div>
+            </div>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn-submit-modern mt-3">
+            <i class="bi bi-check2-circle"></i> حفظ الراتب
+        </button>
+    </form>
+</div>
+
+<script>
+(function() {
+    // ==================== Employee Dropdown (AJAX Search) ====================
+    var searchInput = document.getElementById("employeeSearch");
+    var select = document.getElementById("employeeSelect");
+    var dropdown = document.getElementById("customDropdown");
+    var dropdownDisplay = document.getElementById("dropdownDisplay");
+    var dropdownMenu = document.getElementById("dropdownMenu");
+    var dropdownEmpty = document.getElementById("dropdownEmpty");
+
+    var currentPage = 1;
+    var totalPages = 1;
+    var isLoading = false;
+    var currentKeyword = '';
+
+    // Toggle dropdown
+    dropdownDisplay.addEventListener("click", function(e) {
+        e.stopPropagation();
+        if (dropdownMenu.classList.contains("show")) {
+            dropdownMenu.classList.remove("show");
+            dropdownDisplay.classList.remove("active");
+        } else if (searchInput.value.trim().length >= 1) {
+            dropdownMenu.classList.add("show");
+            dropdownDisplay.classList.add("active");
+        }
+    });
+
+    // Close dropdown on outside click
+    document.addEventListener("click", function(e) {
+        if (!dropdown.contains(e.target)) {
+            dropdownMenu.classList.remove("show");
+            dropdownDisplay.classList.remove("active");
+        }
+    });
+
+    // Select employee from dropdown
+    dropdownMenu.addEventListener("click", function(e) {
+        var item = e.target.closest(".dropdown-item-custom");
+        if (!item) return;
+
+        var val = item.getAttribute("data-value");
+        var name = item.getAttribute("data-name");
+        var dept = item.getAttribute("data-dept");
+
+        // Update select with the selected employee
+        select.innerHTML = '<option value="' + val + '" selected>' + name + '</option>';
+        select.value = val;
+
+        dropdownDisplay.innerHTML = '<div style="display:flex;align-items:center;gap:0.75rem;flex:1;min-width:0;">' +
+            '<div class="emp-avatar" style="width:32px;height:32px;font-size:0.8rem;">' + (name[0] || 'م') + '</div>' +
+            '<div style="min-width:0;"><div style="font-weight:600;font-size:0.9rem;">' + name + '</div>' +
+            (dept ? '<div style="font-size:0.75rem;color:#0f766e;">' + dept + '</div>' : '') + '</div>';
+        dropdownDisplay.innerHTML += '<i class="bi bi-chevron-down"></i>';
+        dropdownMenu.classList.remove("show");
+        dropdownDisplay.classList.remove("active");
+        fetchSalary(val);
+    });
+
+    // Search employees via AJAX
+    var debounceTimer;
+    searchInput.addEventListener("input", function() {
+        clearTimeout(debounceTimer);
+        var q = (this.value || "").trim();
+
+        debounceTimer = setTimeout(function() {
+            if (q.length >= 1) {
+                searchEmployees(q, 1);
+            } else {
+                dropdownMenu.innerHTML = '<div class="dropdown-empty">ابدأ بالكتابة للبحث عن موظف...</div>';
+                dropdownMenu.classList.remove("show");
+                dropdownDisplay.classList.remove("active");
+            }
+        }, 300);
+    });
+
+    function searchEmployees(keyword, page) {
+        if (isLoading) return;
+        isLoading = true;
+        currentKeyword = keyword;
+
+        var url = '/api/employees/search?keyword=' + encodeURIComponent(keyword) + '&page=' + page;
+
+        fetch(url)
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                currentPage = data.page;
+                totalPages = data.pages;
+
+                if (data.employees.length === 0) {
+                    dropdownMenu.innerHTML = '<div class="dropdown-empty">لا توجد نتائج مطابقة</div>';
+                } else {
+                    var html = '';
+                    data.employees.forEach(function(emp) {
+                        html += '<div class="dropdown-item-custom" ' +
+                            'data-value="' + emp.id + '" ' +
+                            'data-name="' + (emp.name || '') + '" ' +
+                            'data-email="' + (emp.email || '') + '" ' +
+                            'data-dept="' + (emp.department || '') + '">' +
+                            '<div class="emp-avatar">' + (emp.name ? emp.name[0] : 'م') + '</div>' +
+                            '<div class="emp-info">' +
+                                '<div class="emp-name">' + (emp.name || '') + '</div>' +
+                                (emp.email ? '<div class="emp-email">' + emp.email + '</div>' : '') +
+                                (emp.department ? '<div class="emp-dept">' + emp.department + '</div>' : '') +
+                            '</div>' +
+                        '</div>';
+                    });
+
+                    // Add pagination info if needed
+                    if (totalPages > 1) {
+                        html += '<div style="padding:0.5rem 1rem;font-size:0.8rem;color:#64748b;text-align:center;border-top:1px solid #f1f5f9;">' +
+                            'الصفحة ' + currentPage + ' من ' + totalPages +
+                            (currentPage < totalPages ? ' <a href="#" onclick="event.preventDefault();searchEmployees(currentKeyword,' + (currentPage+1) + ');">التالي ←</a>' : '') +
+                        '</div>';
+                    }
+
+                    dropdownMenu.innerHTML = html;
+                }
+
+                dropdownMenu.classList.add("show");
+                dropdownDisplay.classList.add("active");
+                isLoading = false;
+            })
+            .catch(function() {
+                dropdownMenu.innerHTML = '<div class="dropdown-empty">حدث خطأ في البحث</div>';
+                isLoading = false;
+            });
+    }
+
+    // Keep select in sync
+    select.addEventListener("change", function() {
+        fetchSalary(this.value);
+    });
+
+    function fetchSalary(empId) {
+        if (!empId) return;
+        fetch("/get_salary/" + empId)
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var salaryInput = document.getElementById("salaryInput");
+                if (salaryInput && data.salary != null) {
+                    salaryInput.value = data.salary;
+                    updateSalaryPreview();
+                }
+            });
+    }
+
+    // ==================== Salary Preview ====================
+    var salaryInput = document.getElementById("salaryInput");
+    var bonusInput = document.getElementById("bonusInput");
+    var deductionsInput = document.getElementById("deductionsInput");
+
+    function updateSalaryPreview() {
+        var base = parseFloat(salaryInput.value) || 0;
+        var bonus = parseFloat(bonusInput.value) || 0;
+        var deduct = parseFloat(deductionsInput.value) || 0;
+
+        // Add allowances from dynamic items
+        var itemRows = document.querySelectorAll(".payroll-item-row");
+        itemRows.forEach(function(row) {
+            var type = row.querySelector("select[name='item_type[]']").value;
+            var amt = parseFloat(row.querySelector("input[name='item_amount[]']").value) || 0;
+            if (type === "allowance") bonus += amt;
+            else deduct += amt;
+        });
+
+        var net = base + bonus - deduct;
+
+        document.getElementById("netSalaryDisplay").textContent = net.toLocaleString('en-US') + ' ر.س';
+        document.getElementById("baseDisplay").textContent = base.toLocaleString('en-US');
+        document.getElementById("allowanceDisplay").textContent = '+' + bonus.toLocaleString('en-US');
+        document.getElementById("deductionDisplay").textContent = '-' + deduct.toLocaleString('en-US');
+
+        // Color coding
+        var preview = document.getElementById("salaryPreview");
+        if (net < 0) {
+            preview.style.background = "linear-gradient(135deg, #dc2626, #991b1b)";
+        } else if (net < base) {
+            preview.style.background = "linear-gradient(135deg, #d97706, #b45309)";
+        } else {
+            preview.style.background = "linear-gradient(135deg, #0f766e, #0d9488)";
+        }
+    }
+
+    salaryInput.addEventListener("input", updateSalaryPreview);
+    bonusInput.addEventListener("input", updateSalaryPreview);
+    deductionsInput.addEventListener("input", updateSalaryPreview);
+
+    // ==================== Payroll Items ====================
+    var itemsContainer = document.getElementById("itemsContainer");
+
+    window.addPayrollItem = function(type, label, amount) {
+        if (!itemsContainer) return;
+        var row = document.createElement('div');
+        row.className = 'payroll-item-row';
+
+        row.innerHTML =
+            '<div class="item-type">' +
+                '<select name="item_type[]" class="form-select form-control-modern form-select-sm" onchange="updateItemBadge(this)">' +
+                    '<option value="allowance"' + (type !== 'deduction' ? ' selected' : '') + '>بدل</option>' +
+                    '<option value="deduction"' + (type === 'deduction' ? ' selected' : '') + '>خصم</option>' +
+                '</select>' +
+            '</div>' +
+            '<div class="item-label">' +
+                '<input name="item_label[]" class="form-control form-control-modern form-control-sm" placeholder="اسم البند (مثال: بدل مواصلات)" value="' + (label || '') + '">' +
+            '</div>' +
+            '<div class="item-amount">' +
+                '<input name="item_amount[]" type="number" step="0.01" class="form-control form-control-modern form-control-sm" placeholder="المبلغ" value="' + (amount || '') + '" oninput="updateSalaryPreview()">' +
+            '</div>' +
+            '<div class="item-remove">' +
+                '<button type="button" class="btn btn-sm btn-outline-danger" title="حذف" onclick="this.closest(\'.payroll-item-row\').remove(); updateSalaryPreview();">' +
+                    '<i class="bi bi-trash"></i>' +
+                '</button>' +
+            '</div>';
+
+        itemsContainer.appendChild(row);
+        updateSalaryPreview();
+    };
+
+    window.updateItemBadge = function(select) {
+        var row = select.closest('.payroll-item-row');
+        updateSalaryPreview();
+    };
+
+    // Default item
+    addPayrollItem();
+
+    // Initial preview
+    updateSalaryPreview();
+})();
+</script>
+{% endblock %}

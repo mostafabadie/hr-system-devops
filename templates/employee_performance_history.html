@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}تاريخ تقييمات الأداء{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">تاريخ تقييمات الأداء - {{ employee.name if employee else '' }}</h2>
+
+{% if evaluations %}
+    <div class="table-responsive mt-4">
+        <table class="table table-bordered table-striped">
+            <thead class="table-light">
+                <tr>
+                    <th>الفترة</th>
+                    <th>التقييم العام</th>
+                    <th>نقاط الأداء</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for eval in evaluations %}
+                <tr>
+                    <td>{{ eval.period_name }} ({{ eval.created_date[:10] }})</td>
+                    <td>{{ eval.overall_rating or "-" }}</td>
+                    <td>{{ eval.overall_score or "-" }}</td>
+                    
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if trend %}
+        <h4 class="mt-5">اتجاه الأداء العام</h4>
+        <canvas id="performanceTrendChart" width="400" height="150"></canvas>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            const ctx = document.getElementById('performanceTrendChart').getContext('2d');
+            const labels = {{ trend|map(attribute='period_name')|list|tojson }};
+            const data = {{ trend|map(attribute='overall_score')|list|tojson }};
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'نقاط الأداء',
+                        data: data,
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, max: 5 }  // افتراض أن التقييم من 0 إلى 5
+                    }
+                }
+            });
+        </script>
+    {% endif %}
+
+{% else %}
+    <p class="text-muted mt-4">لا توجد تقييمات سابقة لهذا الموظف.</p>
+{% endif %}
+
+<div class="mt-4">
+    <a href="{{ url_for('portal.self_portal') }}" class="btn btn-outline-secondary">العودة للبوابة الذاتية</a>
+</div>
+{% endblock %}

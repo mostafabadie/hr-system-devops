@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block page_title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-0 text-gray-800">لوحة المشرف</h1>
+        </div>
+    </div>
+
+    <!-- System Health Row -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-primary text-white shadow">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-white text-uppercase mb-1">
+                                استخدام المعالج
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-100">{{ system_stats.cpu.percent }}%</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-chart-area fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-success text-white shadow">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-white text-uppercase mb-1">
+                                استخدام الذاكرة
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-100">{{ system_stats.memory.percent }}%</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-tachometer-alt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-warning text-white shadow">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-white text-uppercase mb-1">
+                                استخدام القرص
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-100">{{ system_stats.disk.percent }}%</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-database fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-info text-white shadow">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-white text-uppercase mb-1">
+                                حجم قاعدة البيانات
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-100">{{ db_stats.size_mb }} م.ب</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-server fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Database Tables Row -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">إحصائيات جداول قاعدة البيانات</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>الجدول</th>
+                                    <th>عدد السجلات</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>الجدول</th>
+                                    <th>عدد السجلات</th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                {% for table, count in db_stats.tables.items() %}
+                                <tr>
+                                    <td>{{ table }}</td>
+                                    <td>{{ count }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activities Row -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="m-0 font-weight-bold text-primary">النشاطات الحديثة</h6>
+                        <a href="{{ url_for('admin.activities') }}" class="btn btn-sm btn-primary">عرض جميع النشاطات</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="activityTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>الوقت</th>
+                                    <th>المستخدم</th>
+                                    <th>الإجراء</th>
+                                    <th>التفاصيل</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for activity in recent_activities %}
+                                {% if activity.error %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-danger">{{ activity.error }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td>{{ activity.timestamp }}</td>
+                                    <td>{{ activity.user }}</td>
+                                    <td>{{ activity.action }}</td>
+                                    <td>{{ activity.details }}</td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Links Row -->
+    <div class="row mt-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                مراقبة أداء الاستعلامات
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">عرض التفاصيل</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-search fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <a class="card-footer text-white clearfix small z-1" href="{{ url_for('admin.query_performance') }}">
+                    <span class="float-left">عرض تقرير الأداء</span>
+                    <span class="float-right">
+                        <i class="fas fa-angle-right"></i>
+                    </span>
+                </a>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                سجلات المراجعة
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">عرض السجل الكامل</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-history fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <a class="card-footer text-white clearfix small z-1" href="{{ url_for('admin.activities') }}">
+                    <span class="float-left">عرض سجل النشاطات</span>
+                    <span class="float-right">
+                        <i class="fas fa-angle-right"></i>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<!-- Page level plugins -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
+
+<!-- Page level custom scripts -->
+<script>
+    // Auto-refresh the dashboard every 30 seconds
+    setInterval(function(){
+        location.reload();
+    }, 30000); // 30 seconds
+
+    // Example of updating charts with AJAX (if we had real-time data)
+    // This is just a placeholder for future enhancement
+</script>
+{% endblock %}
