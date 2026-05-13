@@ -1,0 +1,22 @@
+name: HR System CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build Docker image
+      run: docker build -t hr-system:latest .
+
+    - name: Run container (test build)
+      run: docker run -d -p 8000:8000 hr-system:latest
