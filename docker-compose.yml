@@ -5,7 +5,7 @@ services:
     build: .
     container_name: hr-system
     ports:
-      - "8000:8000"
+      - "8001:8000"
     restart: always
     volumes:
       - ./data:/app/data
