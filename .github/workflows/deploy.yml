@@ -31,7 +31,8 @@ jobs:
 
           if [ -d "hr-system-devops" ]; then
             cd hr-system-devops
-            git pull origin master
+            git fetch origin
+            git reset --hard origin/master
           else
             git clone https://github.com/mostafabadie/hr-system-devops.git
             cd hr-system-devops
