@@ -38,9 +38,10 @@ jobs:
             cd hr-system-devops
           fi
 
-          docker compose down || true
-          docker compose down --volumes || true
+          docker compose down --remove-orphans || true
+          docker stop $(docker ps -q) || true
+          docker rm $(docker ps -aq) || true
           docker image prune -af || true
 
           docker compose build --no-cache
-          docker compose up -d
+          docker compose up -d --build
