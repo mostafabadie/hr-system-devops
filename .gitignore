@@ -15,7 +15,7 @@ data/*.db
 data/*.sqlite3
 *.db
 *.sqlite3
-!data/hr.db
+data/hr.db
 
 # Logs
 *.log
