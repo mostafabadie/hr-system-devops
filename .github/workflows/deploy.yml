@@ -27,7 +27,7 @@ jobs:
         key: ${{ secrets.EC2_KEY }}
         debug: true
         script: |
-        set -e
+          set -e
           cd hr-system-devops || git clone https://github.com/mostafabadie/hr-system-devops.git && cd hr-system-devops
           git pull origin master
           docker compose down || true
