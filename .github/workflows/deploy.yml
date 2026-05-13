@@ -2,7 +2,7 @@ name: HR System CI/CD
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "master" ]
 
 jobs:
   deploy:
@@ -11,6 +11,11 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+
+    - name: Debug variables
+      run: |
+        echo "HOST=${{ vars.EC2_HOST }}"
+        echo "USER=${{ vars.EC2_USER }}"
 
     - name: Deploy to EC2 via SSH
       uses: appleboy/ssh-action@v1.0.3
