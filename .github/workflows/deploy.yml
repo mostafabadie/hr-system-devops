@@ -29,17 +29,17 @@ jobs:
         script: |
           set -e
 
-if [ -d "hr-system-devops" ]; then
-  cd hr-system-devops
-  git pull origin master
-else
-  git clone https://github.com/mostafabadie/hr-system-devops.git
-  cd hr-system-devops
-fi
+          if [ -d "hr-system-devops" ]; then
+            cd hr-system-devops
+            git pull origin master
+          else
+            git clone https://github.com/mostafabadie/hr-system-devops.git
+            cd hr-system-devops
+          fi
 
-docker compose down || true
-docker compose down --volumes || true
-docker image prune -af || true
+          docker compose down || true
+          docker compose down --volumes || true
+          docker image prune -af || true
 
-docker compose build --no-cache
-docker compose up -d
+          docker compose build --no-cache
+          docker compose up -d
