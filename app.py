@@ -73,9 +73,7 @@ def internal_error(error):
 @app.errorhandler(404)
 def not_found(error):
     return render_template('404.html'), 404
-@app.route("/")
-def home():
-    return redirect("/login")
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
